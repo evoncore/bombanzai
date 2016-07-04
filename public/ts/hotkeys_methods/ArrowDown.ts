@@ -8,8 +8,6 @@ function keyArrowDown() {
 
       if (plm_1.position.y < 780) {
 
-         console.log(plm_1.position.y);
-
         plm_1.canMove.Down = true;
 
         if (exampleWall.blocked) {

@@ -84,52 +84,6 @@ plm_1.canMove = new Object;
 
 
 
-
-
-
-
-
-
-
-
 // UI
 
-$('#game #game-display').append('<div id="grid"></div>');
-$('#game #game-display #grid').css({
-  width: game.Display.width + 1 + 'px',
-  top: $('#game #game-display').css('top')
-});
-
-for (var i = 0; i < 1104; i++) {
-  $('#game #game-display  #grid').append('<i class="map-tile"></i>');
-}
-
-$('#game').prepend('<div id="chat"></div>');
-
-if ($('canvas')[0]) {
-  $('#game #chat').css({height: $('canvas').offset().top + 'px' });
-}
-
-$('body #main-row > .col-md-1').css({ height: $('body').innerHeight() })
-
-if ($(window).innerWidth() <= 991) {
-  $('body').css({backgroundColor: '#fff'});
-  $('body > *').css({display: 'none'});
-  $('body').append('<div id="error9001"><img src="../img/errors/9001.gif" alt=":(" />Ваше устройство не поддерживается</div>')
-} else {
-  $('body #error9001').remove();
-  $('body').css({backgroundColor: '#222'});
-  $('body > *').css({display: 'block'});
-}
-
-$(window).on('resize', function() {
-  if ($(window).innerWidth() <= 991) {
-    $('body').css({backgroundColor: '#fff'});
-    $('body > *').css({display: 'none'});
-    $('body').append('<div id="error9001"><img src="../img/errors/9001.gif" alt=":(" />Ваше устройство не поддерживается</div>')
-  } else {
-    $('body #error9001').remove();
-    $('body').css({backgroundColor: '#222'});
-    $('body > *').css({display: 'block'});
-  }
-});
+/// <reference path="ui.ts"/>

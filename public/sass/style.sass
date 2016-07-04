@@ -7,9 +7,10 @@
 // Variables
 
 $mt: .2s // Main Transition
-$mf: 'Open Sans' // Main Font
+$mf: 'Exo 2' // Main Font
+$sf: 'Montserrat' // Second Font
 $af: sans-serif, Arial // Alternative Fonts
-$mc: #CF31D5
+$mc: #CF31D5 // Main Color
 
 
 // Reset
@@ -33,9 +34,30 @@ body
   font-size: 1em
   overflow: hidden
   height: 100%
+  min-height: 100%
+  position: relative
+  font-family: $mf, $af
+
+section
+  display: none
+  position: absolute
+  box-sizing: border-box
+  padding: 20px
+
+#game
+  padding: 0
 
 nav
   cursor: default
+
+.container-fluid, .col-md-10, .col-md-1
+  padding: 0
+
+.container-fluid, .col-md-10, #main-row
+  height: 100%
+
+.row
+  margin: 0
 
 #message
   position: absolute
@@ -52,14 +74,42 @@ nav
   p
     margin-bottom: 0
 
+
+// Main
+
+main
+  border-left: 3px solid $mc
+
+
 // Aside
 
+#navigation
+  position: relative
+  #logo
+    display: block
+    transform: rotate(-90deg)
+    position: absolute
+    right: 2px
+    top: 12%
+    font: 700 2.5em $sf, $af
+    color: #fff
+    &:first-letter
+      color: $mc
+    i
+      font-style: normal
+      color: $mc
+
 aside
-  display: block
-  background-color: #111
+  display: flex
+  flex-direction: column
+  align-content: center
+  justify-content: center
   text-align: center
-  height: 100%
+  background-color: #111
   z-index: 999
+  height: 100%
+  width: 100%
+  box-sizing: border-box
   .fa
     font-size: 24px
   nav
@@ -67,23 +117,33 @@ aside
       display: block
     a
       display: block
+      width: 100%
       font: 600 1.5em $mf, $af
       color: #fff
       padding: 5px 10px
       margin: 15px 0
       transition: $mt
+      border: 6px solid transparent
+      &:before
+        margin-right: 6px
       &:hover
         color: $mc
+    .active
+      color: $mc
+      border-right: 6px solid $mc
 
 // Game
 
 #game
   position: relative
+  height: 100%
+  left: 2%
   #game-display
-    position: relative
+    position: absolute
     overflow: hidden
+    bottom: 0
     width: 960px
-    height: 680px
+    height: 560px
     max-width: 960px
     max-height: 680px
   #grid
@@ -92,7 +152,7 @@ aside
     // border-bottom: 1px solid rgba(255,255,255,.2)
     // border-left: 1px solid rgba(255,255,255,.2)
     left: 0
-    top: 0
+    bottom: 0
 
 .map-tile
   width: 20px
@@ -113,9 +173,6 @@ aside
 
 canvas
   display: block
-  position: absolute
-  top: 130px
-  left: 0
   background-color: #666
   overflow: hidden
   border: 1px solid #fff
@@ -127,6 +184,8 @@ canvas
   width: 960px
   background-color: rgba(255,255,255,.1)
   position: absolute
+  box-sizing: border-box
+  padding: 0 20px
 
 // Status Bar
 
@@ -150,6 +209,6 @@ canvas
     margin: 10px auto
 
 
-@media screen and (max-width: 991px)
+@media screen and (max-width: 1199px)
   body > *
     display: none
