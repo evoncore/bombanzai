@@ -14,7 +14,7 @@ function keySpacebar() {
           let _firstBomb = bomb;
           setTimeout(function(){
             worldMap.containers.bombs.removeChild(_firstBomb.model);
-          }, 1000);
+          }, 2000);
         }
       } else if (plm_1.position.x != bomb.model.position.x || plm_1.position.y != bomb.model.position.y) {
         bomb = new Bomb(PIXI.Texture.fromImage('../img/bomb.png'), plm_1.position.x, plm_1.position.y);
@@ -24,7 +24,7 @@ function keySpacebar() {
           let _otherBomb = bomb;
           setTimeout(function(){
             worldMap.containers.bombs.removeChild(_otherBomb.model);
-          }, 1000);
+          }, 2000);
         }
       }
 

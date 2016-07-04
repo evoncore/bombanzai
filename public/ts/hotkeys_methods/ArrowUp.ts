@@ -7,7 +7,6 @@ function keyArrowUp() {
     pressed: function() {
 
       if (plm_1.position.y > 0) {
-
         plm_1.canMove.Up = true;
 
         if (exampleWall.blocked) {
@@ -23,16 +22,12 @@ function keyArrowUp() {
             player_1.camera.y -= 1 * player_1.speed;
           }
 
-          $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
-          $('#game #game-display #grid').css({
-            width: game.Display.width + 1 + 'px',
-            top: $('canvas').css('margin-top'),
-            left: $('canvas').css('left')
-          });
+          player_1.camera.show(player_1.camera.y, 'y');
         } else {
           plm_1.position.y -= 1 * player_1.speed;
+          player_1.camera.y -= 1 * player_1.speed;
+          player_1.camera.show(player_1.camera.y, 'y');
         }
-
       }
     }
 

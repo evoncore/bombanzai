@@ -7,8 +7,21 @@ class Player extends Block
   speed;
 
   camera = {
-    x: -400,
-    y: -160
+    x: -460,
+    y: -240,
+    show: function(coord, vector) {
+      if (vector == 'y') {
+        $('canvas').css({ marginTop: -coord + 'px' });
+      } else if (vector == 'x') {
+        $('canvas').css({ marginLeft: -coord + 'px' });
+      }
+
+      $('#game #game-display #grid').css({
+        width: game.Display.width + 1 + 'px',
+        top: $('canvas').css('margin-top'),
+        left: $('canvas').css('left')
+      });
+    }
   };
 
   constructor(texture, x, y) {
@@ -26,5 +39,10 @@ class Player extends Block
 
     this.speed = this.size;
   };
+
+  setCamera(x, y) {
+    this.camera.x = x;
+    this.camera.y = y;
+  }
 
 }

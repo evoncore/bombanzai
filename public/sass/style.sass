@@ -9,6 +9,7 @@
 $mt: .2s // Main Transition
 $mf: 'Exo 2' // Main Font
 $sf: 'Montserrat' // Second Font
+$ap: 'Anonymous Pro' // Anonymous Pro
 $af: sans-serif, Arial // Alternative Fonts
 $mc: #CF31D5 // Main Color
 
@@ -24,6 +25,9 @@ a
   &:hover, &:focus, &:active
     text-decoration: none
     color: #fff
+
+h1
+  margin: 0
 
 
 // Main Settings
@@ -43,6 +47,7 @@ section
   position: absolute
   box-sizing: border-box
   padding: 20px
+  padding-left: 60px
 
 #game
   padding: 0
@@ -50,10 +55,10 @@ section
 nav
   cursor: default
 
-.container-fluid, .col-md-10, .col-md-1
+.container-fluid, .col-md-9, .col-md-1, .col-md-2
   padding: 0
 
-.container-fluid, .col-md-10, #main-row
+.container-fluid, .col-md-9, #main-row
   height: 100%
 
 .row
@@ -74,6 +79,9 @@ nav
   p
     margin-bottom: 0
 
+h1
+  color: #444
+
 
 // Main
 
@@ -89,8 +97,8 @@ main
     display: block
     transform: rotate(-90deg)
     position: absolute
-    right: 2px
-    top: 12%
+    right: -37px
+    top: 8%
     font: 700 2.5em $sf, $af
     color: #fff
     &:first-letter
@@ -137,12 +145,12 @@ aside
 #game
   position: relative
   height: 100%
-  left: 2%
   #game-display
+    background-color: rgba(255,255,255,.1)
     position: absolute
     overflow: hidden
-    bottom: 0
-    width: 960px
+    top: 0
+    width: 950px
     height: 560px
     max-width: 960px
     max-height: 680px
@@ -178,20 +186,29 @@ canvas
   border: 1px solid #fff
 
 
-// Chat
+// bar
 
-#chat
-  width: 960px
+#bar
+  width: 150%
   background-color: rgba(255,255,255,.1)
   position: absolute
   box-sizing: border-box
-  padding: 0 20px
+  padding: 20px
+  bottom: 0
+  height: 130px
+  span
+    display: inline-block
+    margin: 0 15px
+    font: 400 1.5em $ap, $af
 
 // Status Bar
 
-#status-bar
-  height: 100%
+#chat
   background-color: rgba(255,255,255,.3)
+  width: 100%
+  text-align: center
+  box-sizing: border-box
+  padding: 15px 0
 
 
 #error9001
@@ -208,6 +225,19 @@ canvas
     display: block
     margin: 10px auto
 
+@media (min-width: 1440px)
+  h1
+    font-size: 5em
+  #navigation
+    #logo
+      font-size: 3em
+      top: 10%
+  aside
+    .fa
+      font-size: 3em
+  #bar
+    span
+      font-size: 2em
 
 @media screen and (max-width: 1199px)
   body > *

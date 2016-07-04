@@ -22,17 +22,13 @@ function keyArrowRight() {
             player_1.camera.x += 1 * player_1.speed;
           }
 
-          $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
-          $('#game #game-display #grid').css({
-            width: game.Display.width + 1 + 'px',
-            top: $('canvas').css('margin-top'),
-            left: $('canvas').css('left')
-          });
+          player_1.camera.show(player_1.camera.x, 'x');
         } else {
           plm_1.position.x += 1 * player_1.speed;
+          player_1.camera.x += 1 * player_1.speed;
+          player_1.camera.show(player_1.camera.x, 'x');
         }
       }
-
     }
 
   }

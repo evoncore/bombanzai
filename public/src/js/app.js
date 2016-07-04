@@ -9,8 +9,8 @@ function slicePixels(obj) {
 var Game = (function () {
     function Game() {
         this.Display = {
-            width: 1020,
-            height: 760
+            width: 1000,
+            height: 1000
         };
     }
     return Game;
@@ -41,8 +41,21 @@ var Player = (function (_super) {
     function Player(texture, x, y) {
         _super.call(this, true);
         this.camera = {
-            x: -400,
-            y: -160
+            x: -460,
+            y: -240,
+            show: function (coord, vector) {
+                if (vector == 'y') {
+                    $('canvas').css({ marginTop: -coord + 'px' });
+                }
+                else if (vector == 'x') {
+                    $('canvas').css({ marginLeft: -coord + 'px' });
+                }
+                $('#game #game-display #grid').css({
+                    width: game.Display.width + 1 + 'px',
+                    top: $('canvas').css('margin-top'),
+                    left: $('canvas').css('left')
+                });
+            }
         };
         this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
@@ -53,6 +66,10 @@ var Player = (function (_super) {
         this.speed = this.size;
     }
     ;
+    Player.prototype.setCamera = function (x, y) {
+        this.camera.x = x;
+        this.camera.y = y;
+    };
     return Player;
 }(Block));
 var Bomb = (function (_super) {
@@ -99,24 +116,11 @@ var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
 var exampleBlock = new Block(false);
 var game = new Game;
 var worldMap = new WorldMap;
-var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 40, 60);
+var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 180, 140);
 var plm_1 = player_1.model;
 var wall_1 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 40);
-var wall_7 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 60);
-var wall_8 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 80);
-var wall_9 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 100);
-var wall_10 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 60, 40);
-var wall_11 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 40, 40);
-var wall_12 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 20, 40);
-var wall_13 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 40);
-var wall_14 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 60);
-var wall_15 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 80);
-var wall_16 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 100);
 var wall_2 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 300, 60);
 var wall_3 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 240, 60);
-var wall_4 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 60, 240);
-var wall_5 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 400, 300);
-var wall_6 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 300, 600);
 worldMap.containers.map.addChild(worldMap.containers.players);
 worldMap.containers.map.addChild(worldMap.containers.bombs);
 worldMap.containers.map.addChild(worldMap.containers.walls);
@@ -124,19 +128,6 @@ worldMap.containers.players.addChild(plm_1);
 worldMap.containers.walls.addChild(wall_1.model);
 worldMap.containers.walls.addChild(wall_2.model);
 worldMap.containers.walls.addChild(wall_3.model);
-worldMap.containers.walls.addChild(wall_4.model);
-worldMap.containers.walls.addChild(wall_5.model);
-worldMap.containers.walls.addChild(wall_6.model);
-worldMap.containers.walls.addChild(wall_7.model);
-worldMap.containers.walls.addChild(wall_8.model);
-worldMap.containers.walls.addChild(wall_9.model);
-worldMap.containers.walls.addChild(wall_10.model);
-worldMap.containers.walls.addChild(wall_11.model);
-worldMap.containers.walls.addChild(wall_12.model);
-worldMap.containers.walls.addChild(wall_13.model);
-worldMap.containers.walls.addChild(wall_14.model);
-worldMap.containers.walls.addChild(wall_15.model);
-worldMap.containers.walls.addChild(wall_16.model);
 var renderer = PIXI.autoDetectRenderer(game.Display.width, game.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
 $('#game #game-display').append(renderer.view);
@@ -207,15 +198,12 @@ function keyArrowDown() {
                         plm_1.position.y += 1 * player_1.speed;
                         player_1.camera.y += 1 * player_1.speed;
                     }
-                    $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
-                    $('#game #game-display #grid').css({
-                        width: game.Display.width + 1 + 'px',
-                        top: $('canvas').css('margin-top'),
-                        left: $('canvas').css('left')
-                    });
+                    player_1.camera.show(player_1.camera.y, 'y');
                 }
                 else {
                     plm_1.position.y += 1 * player_1.speed;
+                    player_1.camera.y += 1 * player_1.speed;
+                    player_1.camera.show(player_1.camera.y, 'y');
                 }
             }
         }
@@ -239,15 +227,12 @@ function keyArrowUp() {
                         plm_1.position.y -= 1 * player_1.speed;
                         player_1.camera.y -= 1 * player_1.speed;
                     }
-                    $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
-                    $('#game #game-display #grid').css({
-                        width: game.Display.width + 1 + 'px',
-                        top: $('canvas').css('margin-top'),
-                        left: $('canvas').css('left')
-                    });
+                    player_1.camera.show(player_1.camera.y, 'y');
                 }
                 else {
                     plm_1.position.y -= 1 * player_1.speed;
+                    player_1.camera.y -= 1 * player_1.speed;
+                    player_1.camera.show(player_1.camera.y, 'y');
                 }
             }
         }
@@ -271,15 +256,12 @@ function keyArrowRight() {
                         plm_1.position.x += 1 * player_1.speed;
                         player_1.camera.x += 1 * player_1.speed;
                     }
-                    $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
-                    $('#game #game-display #grid').css({
-                        width: game.Display.width + 1 + 'px',
-                        top: $('canvas').css('margin-top'),
-                        left: $('canvas').css('left')
-                    });
+                    player_1.camera.show(player_1.camera.x, 'x');
                 }
                 else {
                     plm_1.position.x += 1 * player_1.speed;
+                    player_1.camera.x += 1 * player_1.speed;
+                    player_1.camera.show(player_1.camera.x, 'x');
                 }
             }
         }
@@ -303,15 +285,12 @@ function keyArrowLeft() {
                         plm_1.position.x -= 1 * player_1.speed;
                         player_1.camera.x -= 1 * player_1.speed;
                     }
-                    $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
-                    $('#game #game-display #grid').css({
-                        width: game.Display.width + 1 + 'px',
-                        top: $('canvas').css('margin-top'),
-                        left: $('canvas').css('left')
-                    });
+                    player_1.camera.show(player_1.camera.x, 'x');
                 }
                 else {
                     plm_1.position.x -= 1 * player_1.speed;
+                    player_1.camera.x -= 1 * player_1.speed;
+                    player_1.camera.show(player_1.camera.x, 'x');
                 }
             }
         }
@@ -328,7 +307,7 @@ function keySpacebar() {
                     var _firstBomb_1 = bomb;
                     setTimeout(function () {
                         worldMap.containers.bombs.removeChild(_firstBomb_1.model);
-                    }, 1000);
+                    }, 2000);
                 }
             }
             else if (plm_1.position.x != bomb.model.position.x || plm_1.position.y != bomb.model.position.y) {
@@ -338,7 +317,7 @@ function keySpacebar() {
                     var _otherBomb_1 = bomb;
                     setTimeout(function () {
                         worldMap.containers.bombs.removeChild(_otherBomb_1.model);
-                    }, 1000);
+                    }, 2000);
                 }
             }
         }
@@ -353,9 +332,12 @@ function keySpacebar() {
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
 var controls = new Controls;
 var bomb;
+player_1.camera.x += plm_1.position.x;
+player_1.camera.y += plm_1.position.y;
 $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
 $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
 $(document).on('keydown', function (e) {
+    // Disable all default key-events
     // if (e.stopPropagation) {
     //   e.stopPropagation();
     //   e.preventDefault();
@@ -363,22 +345,30 @@ $(document).on('keydown', function (e) {
     switch (e.which) {
         case controls.Keyboard.key.arrowDown.val:
             ////
+            // if (!two_keys) {
             controls.Keyboard.key.arrowDown.action();
+            // }
             ////
             break;
         case controls.Keyboard.key.arrowUp.val:
             ////
+            // if (!two_keys) {
             controls.Keyboard.key.arrowUp.action();
+            // }
             ////
             break;
         case controls.Keyboard.key.arrowRight.val:
             ////
+            // if (!two_keys) {
             controls.Keyboard.key.arrowRight.action();
+            // }
             ////
             break;
         case controls.Keyboard.key.arrowLeft.val:
             ////
+            // if (!two_keys) {
             controls.Keyboard.key.arrowLeft.action();
+            // }
             ////
             break;
         case controls.Keyboard.key.Spacebar.val:
@@ -388,6 +378,45 @@ $(document).on('keydown', function (e) {
             break;
     }
 });
+// Top Left
+twoKeysDown(function () {
+    controls.Keyboard.key.arrowUp.action();
+    controls.Keyboard.key.arrowLeft.action();
+}, controls.Keyboard.key.arrowUp.val, controls.Keyboard.key.arrowLeft.val);
+// Top Right
+twoKeysDown(function () {
+    controls.Keyboard.key.arrowUp.action();
+    controls.Keyboard.key.arrowRight.action();
+}, controls.Keyboard.key.arrowUp.val, controls.Keyboard.key.arrowRight.val);
+// Bottom Left
+twoKeysDown(function () {
+    controls.Keyboard.key.arrowDown.action();
+    controls.Keyboard.key.arrowLeft.action();
+}, controls.Keyboard.key.arrowDown.val, controls.Keyboard.key.arrowLeft.val);
+// Bottom Right
+twoKeysDown(function () {
+    controls.Keyboard.key.arrowDown.action();
+    controls.Keyboard.key.arrowRight.action();
+}, controls.Keyboard.key.arrowRight.val, controls.Keyboard.key.arrowDown.val);
+function twoKeysDown(func, key1, key2) {
+    var codes = [].slice.call(arguments, 1);
+    var pressed = {};
+    $(document).on('keydown', function (e) {
+        pressed[e.keyCode] = true;
+        for (var i = 0; i < codes.length; i++) {
+            if (!pressed[codes[i]]) {
+                return;
+            }
+        }
+        // if want one click
+        // pressed = {};
+        func();
+    });
+    $(document).on('keyup', function (e) {
+        delete pressed[e.keyCode];
+    });
+}
+/// <reference path="app.ts"/>
 // One Page App
 $(window).on('gamepadconnection', function (e) {
     console.log('gamepad-connected!');
@@ -411,6 +440,19 @@ $('aside nav a').on('click', function (e) {
             .removeClass('active');
         $('section').stop().fadeOut(200);
         $('#' + url).stop().fadeIn(200);
+        if (url != 'game') {
+            $('#bar').stop().animate({ opacity: 0 }, 0);
+            $('#chat').stop().animate({
+                height: $('body').innerHeight()
+            }, 300);
+        }
+        else {
+            $('#chat').stop().animate({
+                height: $('#game #game-display').height()
+            }, 300, function () {
+                $('#bar').stop().animate({ opacity: 1 }, 300);
+            });
+        }
     }
 });
 // Grid
@@ -423,17 +465,17 @@ $('#game #game-display #grid').css({
 for (var i = 0; i < 0; i++) {
     $('#game #game-display  #grid').append('<i class="map-tile"></i>');
 }
-// Chat
-$('#game').prepend('<div id="chat"></div>');
-if ($('canvas')[0]) {
-    $('#game #chat').css({ height: Math.abs($('#game #game-display').offset().top / 4) + 'px' });
-}
-$('#game #chat').append('<h3>Chat</h3>');
-$('#game #chat').append('<p>message 1</p>');
-$('#game #chat').append('<p>message 2</p>');
+// Bar
+$('#game').append('<div id="bar"></div>');
+$('#game #bar').append('<span>hp: <b>100 / 100</b></span>');
+$('#game #bar').append('<span>bombs: <b>∞ / ∞</b></span>');
 // Asides
 $('body').css({ height: $(window).innerHeight() });
-$('body #main-row > .col-md-1').css({ height: $('body').innerHeight() });
+$('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });
+// Chat
+$('#chat').css({
+    height: $('#game #game-display').height()
+});
 // Errors
 if ($(window).innerWidth() <= 1199) {
     $('body').css({ backgroundColor: '#fff' });
@@ -456,4 +498,6 @@ $(window).on('resize', function () {
         $('body').css({ backgroundColor: '#222' });
         $('body > *').css({ display: 'block' });
     }
+    $('body').css({ height: $(window).innerHeight() });
+    $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });
 });

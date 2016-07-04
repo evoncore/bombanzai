@@ -4,7 +4,6 @@ class Wall extends Block
 
   texture;
   model;
-  speed;
 
   constructor(texture, x, y) {
     super(true);

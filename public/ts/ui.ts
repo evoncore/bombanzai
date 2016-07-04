@@ -1,3 +1,4 @@
+/// <reference path="app.ts"/>
 
 // One Page App
 
@@ -31,6 +32,19 @@ $('aside nav a').on('click', function(e) {
 
     $('section').stop().fadeOut(200);
     $('#' + url).stop().fadeIn(200);
+
+    if (url != 'game') {
+      $('#bar').stop().animate({opacity: 0}, 0);
+      $('#chat').stop().animate({
+        height: $('body').innerHeight()
+      }, 300);
+    } else {
+      $('#chat').stop().animate({
+        height: $('#game #game-display').height()
+      }, 300, function() {
+        $('#bar').stop().animate({opacity: 1}, 300);
+      });
+    }
   }
 
 });
@@ -50,23 +64,25 @@ for (var i = 0; i < 0; i++) {
 }
 
 
-// Chat
+// Bar
 
-$('#game').prepend('<div id="chat"></div>');
+$('#game').append('<div id="bar"></div>');
 
-if ($('canvas')[0]) {
-  $('#game #chat').css({height: Math.abs($('#game #game-display').offset().top / 4) + 'px' });
-}
-
-$('#game #chat').append('<h3>Chat</h3>');
-$('#game #chat').append('<p>message 1</p>');
-$('#game #chat').append('<p>message 2</p>');
+$('#game #bar').append('<span>hp: <b>100 / 100</b></span>');
+$('#game #bar').append('<span>bombs: <b>∞ / ∞</b></span>');
 
 
 // Asides
 
 $('body').css({ height: $(window).innerHeight() })
-$('body #main-row > .col-md-1').css({ height: $('body').innerHeight() })
+$('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() })
+
+
+// Chat
+
+$('#chat').css({
+  height: $('#game #game-display').height()
+});
 
 
 // Errors
@@ -91,4 +107,7 @@ $(window).on('resize', function() {
     $('body').css({backgroundColor: '#222'});
     $('body > *').css({display: 'block'});
   }
+
+  $('body').css({ height: $(window).innerHeight() })
+  $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() })
 });
