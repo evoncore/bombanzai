@@ -1,6 +1,9 @@
 
 // One Page App
 
+$(window).on('gamepadconnection', function(e) {
+  console.log('gamepad-connected!');
+});
 
 $('aside nav a.game').addClass('active');
 location.href = '#/game';
@@ -33,18 +36,16 @@ $('aside nav a').on('click', function(e) {
 });
 
 
-// Game Display
+// Grid
 
 $('#game #game-display').append('<div id="grid"></div>');
 $('#game #game-display #grid').css({
   width: game.Display.width + 1 + 'px',
-  top: $('#game #game-display').css('top')
+  top: $('canvas').css('margin-top'),
+  left: $('canvas').css('left')
 });
 
-
-// Grid
-
-for (var i = 0; i < 1104; i++) {
+for (var i = 0; i < 0; i++) {
   $('#game #game-display  #grid').append('<i class="map-tile"></i>');
 }
 

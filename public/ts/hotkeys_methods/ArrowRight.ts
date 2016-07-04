@@ -6,7 +6,7 @@ function keyArrowRight() {
 
     pressed: function() {
 
-      if (plm_1.position.x < 1300) {
+      if (plm_1.position.x < (game.Display.width - exampleBlock.size)) {
         plm_1.canMove.right = true;
 
         if (exampleWall.blocked) {
@@ -19,7 +19,15 @@ function keyArrowRight() {
 
           if (plm_1.canMove.right) {
             plm_1.position.x += 1 * player_1.speed;
+            player_1.camera.x += 1 * player_1.speed;
           }
+
+          $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
+          $('#game #game-display #grid').css({
+            width: game.Display.width + 1 + 'px',
+            top: $('canvas').css('margin-top'),
+            left: $('canvas').css('left')
+          });
         } else {
           plm_1.position.x += 1 * player_1.speed;
         }

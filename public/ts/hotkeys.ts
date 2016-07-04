@@ -9,6 +9,8 @@
 var controls = new Controls;
 var bomb;
 
+$('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
+$('canvas').css({ marginTop: -player_1.camera.y + 'px' });
 
 $(document).on('keydown', function(e) {
 

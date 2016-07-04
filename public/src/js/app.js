@@ -9,8 +9,8 @@ function slicePixels(obj) {
 var Game = (function () {
     function Game() {
         this.Display = {
-            width: 1200,
-            height: 800
+            width: 1020,
+            height: 760
         };
     }
     return Game;
@@ -40,6 +40,10 @@ var Player = (function (_super) {
     __extends(Player, _super);
     function Player(texture, x, y) {
         _super.call(this, true);
+        this.camera = {
+            x: -400,
+            y: -160
+        };
         this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
         this.model.position.x = x;
@@ -49,8 +53,6 @@ var Player = (function (_super) {
         this.speed = this.size;
     }
     ;
-    Player.prototype.camera = function () {
-    };
     return Player;
 }(Block));
 var Bomb = (function (_super) {
@@ -92,10 +94,11 @@ var Wall = (function (_super) {
 /// <reference path="gameplay_classes/Bomb.ts"/>
 /// <reference path="gameplay_classes/Wall.ts"/>
 //=== CODE ===//
-var game = new Game;
-var worldMap = new WorldMap;
 // DO NOT TOUCH. Not for dynamic generation; initialized in the code
 var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
+var exampleBlock = new Block(false);
+var game = new Game;
+var worldMap = new WorldMap;
 var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 40, 60);
 var plm_1 = player_1.model;
 var wall_1 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 40);
@@ -190,7 +193,7 @@ var Controls = (function () {
 function keyArrowDown() {
     return {
         pressed: function () {
-            if (plm_1.position.y < 780) {
+            if (plm_1.position.y < (game.Display.height - exampleBlock.size)) {
                 plm_1.canMove.Down = true;
                 if (exampleWall.blocked) {
                     for (var i = 0; i < worldMap.containers.walls.children.length; i++) {
@@ -202,7 +205,14 @@ function keyArrowDown() {
                     }
                     if (plm_1.canMove.Down) {
                         plm_1.position.y += 1 * player_1.speed;
+                        player_1.camera.y += 1 * player_1.speed;
                     }
+                    $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
+                    $('#game #game-display #grid').css({
+                        width: game.Display.width + 1 + 'px',
+                        top: $('canvas').css('margin-top'),
+                        left: $('canvas').css('left')
+                    });
                 }
                 else {
                     plm_1.position.y += 1 * player_1.speed;
@@ -227,7 +237,14 @@ function keyArrowUp() {
                     }
                     if (plm_1.canMove.Up) {
                         plm_1.position.y -= 1 * player_1.speed;
+                        player_1.camera.y -= 1 * player_1.speed;
                     }
+                    $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
+                    $('#game #game-display #grid').css({
+                        width: game.Display.width + 1 + 'px',
+                        top: $('canvas').css('margin-top'),
+                        left: $('canvas').css('left')
+                    });
                 }
                 else {
                     plm_1.position.y -= 1 * player_1.speed;
@@ -240,7 +257,7 @@ function keyArrowUp() {
 function keyArrowRight() {
     return {
         pressed: function () {
-            if (plm_1.position.x < 1300) {
+            if (plm_1.position.x < (game.Display.width - exampleBlock.size)) {
                 plm_1.canMove.right = true;
                 if (exampleWall.blocked) {
                     for (var i = 0; i < worldMap.containers.walls.children.length; i++) {
@@ -252,7 +269,14 @@ function keyArrowRight() {
                     }
                     if (plm_1.canMove.right) {
                         plm_1.position.x += 1 * player_1.speed;
+                        player_1.camera.x += 1 * player_1.speed;
                     }
+                    $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
+                    $('#game #game-display #grid').css({
+                        width: game.Display.width + 1 + 'px',
+                        top: $('canvas').css('margin-top'),
+                        left: $('canvas').css('left')
+                    });
                 }
                 else {
                     plm_1.position.x += 1 * player_1.speed;
@@ -277,7 +301,14 @@ function keyArrowLeft() {
                     }
                     if (plm_1.canMove.left) {
                         plm_1.position.x -= 1 * player_1.speed;
+                        player_1.camera.x -= 1 * player_1.speed;
                     }
+                    $('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
+                    $('#game #game-display #grid').css({
+                        width: game.Display.width + 1 + 'px',
+                        top: $('canvas').css('margin-top'),
+                        left: $('canvas').css('left')
+                    });
                 }
                 else {
                     plm_1.position.x -= 1 * player_1.speed;
@@ -322,6 +353,8 @@ function keySpacebar() {
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
 var controls = new Controls;
 var bomb;
+$('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
+$('canvas').css({ marginTop: -player_1.camera.y + 'px' });
 $(document).on('keydown', function (e) {
     // if (e.stopPropagation) {
     //   e.stopPropagation();
@@ -356,6 +389,9 @@ $(document).on('keydown', function (e) {
     }
 });
 // One Page App
+$(window).on('gamepadconnection', function (e) {
+    console.log('gamepad-connected!');
+});
 $('aside nav a.game').addClass('active');
 location.href = '#/game';
 $('section').stop().fadeOut(200);
@@ -377,14 +413,14 @@ $('aside nav a').on('click', function (e) {
         $('#' + url).stop().fadeIn(200);
     }
 });
-// Game Display
+// Grid
 $('#game #game-display').append('<div id="grid"></div>');
 $('#game #game-display #grid').css({
     width: game.Display.width + 1 + 'px',
-    top: $('#game #game-display').css('top')
+    top: $('canvas').css('margin-top'),
+    left: $('canvas').css('left')
 });
-// Grid
-for (var i = 0; i < 1104; i++) {
+for (var i = 0; i < 0; i++) {
     $('#game #game-display  #grid').append('<i class="map-tile"></i>');
 }
 // Chat

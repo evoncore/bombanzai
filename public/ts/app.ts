@@ -15,11 +15,14 @@
 
 //=== CODE ===//
 
+// DO NOT TOUCH. Not for dynamic generation; initialized in the code
+var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
+var exampleBlock = new Block(false);
+
+
 var game = new Game;
 var worldMap = new WorldMap;
 
-// DO NOT TOUCH. Not for dynamic generation; initialized in the code
-var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
 
 var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 40, 60);
 var plm_1 = player_1.model;

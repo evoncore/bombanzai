@@ -20,7 +20,15 @@ function keyArrowUp() {
 
           if (plm_1.canMove.Up) {
             plm_1.position.y -= 1 * player_1.speed;
+            player_1.camera.y -= 1 * player_1.speed;
           }
+
+          $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
+          $('#game #game-display #grid').css({
+            width: game.Display.width + 1 + 'px',
+            top: $('canvas').css('margin-top'),
+            left: $('canvas').css('left')
+          });
         } else {
           plm_1.position.y -= 1 * player_1.speed;
         }

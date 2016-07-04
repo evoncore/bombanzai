@@ -6,7 +6,7 @@ function keyArrowDown() {
 
     pressed: function() {
 
-      if (plm_1.position.y < 780) {
+      if (plm_1.position.y < (game.Display.height - exampleBlock.size)) {
 
         plm_1.canMove.Down = true;
 
@@ -20,7 +20,15 @@ function keyArrowDown() {
 
           if (plm_1.canMove.Down) {
             plm_1.position.y += 1 * player_1.speed;
+            player_1.camera.y += 1 * player_1.speed;
           }
+
+          $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
+          $('#game #game-display #grid').css({
+            width: game.Display.width + 1 + 'px',
+            top: $('canvas').css('margin-top'),
+            left: $('canvas').css('left')
+          });
         } else {
           plm_1.position.y += 1 * player_1.speed;
         }

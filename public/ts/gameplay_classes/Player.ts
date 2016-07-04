@@ -6,6 +6,11 @@ class Player extends Block
   model;
   speed;
 
+  camera = {
+    x: -400,
+    y: -160
+  };
+
   constructor(texture, x, y) {
     super(true);
 
@@ -21,9 +26,5 @@ class Player extends Block
 
     this.speed = this.size;
   };
-
-  camera() {
-
-  }
 
 }
