@@ -62,49 +62,49 @@ $(document).on('keydown', function(e) {
 
 
 
-// Top Left
+// // Top Left
 
-twoKeysDown(
-  function() {
-    controls.Keyboard.key.arrowUp.action();
-    controls.Keyboard.key.arrowLeft.action();
-  },
-  controls.Keyboard.key.arrowUp.val,
-  controls.Keyboard.key.arrowLeft.val
-);
+// twoKeysDown(
+//   function() {
+//     controls.Keyboard.key.arrowUp.action();
+//     controls.Keyboard.key.arrowLeft.action();
+//   },
+//   controls.Keyboard.key.arrowUp.val,
+//   controls.Keyboard.key.arrowLeft.val
+// );
 
-// Top Right
+// // Top Right
 
-twoKeysDown(
-  function() {
-    controls.Keyboard.key.arrowUp.action();
-    controls.Keyboard.key.arrowRight.action();
-  },
-  controls.Keyboard.key.arrowUp.val,
-  controls.Keyboard.key.arrowRight.val
-);
+// twoKeysDown(
+//   function() {
+//     controls.Keyboard.key.arrowUp.action();
+//     controls.Keyboard.key.arrowRight.action();
+//   },
+//   controls.Keyboard.key.arrowUp.val,
+//   controls.Keyboard.key.arrowRight.val
+// );
 
-// Bottom Left
+// // Bottom Left
 
-twoKeysDown(
-  function() {
-    controls.Keyboard.key.arrowDown.action();
-    controls.Keyboard.key.arrowLeft.action();
-  },
-  controls.Keyboard.key.arrowDown.val,
-  controls.Keyboard.key.arrowLeft.val
-);
+// twoKeysDown(
+//   function() {
+//     controls.Keyboard.key.arrowDown.action();
+//     controls.Keyboard.key.arrowLeft.action();
+//   },
+//   controls.Keyboard.key.arrowDown.val,
+//   controls.Keyboard.key.arrowLeft.val
+// );
 
-// Bottom Right
+// // Bottom Right
 
-twoKeysDown(
-  function() {
-    controls.Keyboard.key.arrowDown.action();
-    controls.Keyboard.key.arrowRight.action();
-  },
-  controls.Keyboard.key.arrowRight.val,
-  controls.Keyboard.key.arrowDown.val
-);
+// twoKeysDown(
+//   function() {
+//     controls.Keyboard.key.arrowDown.action();
+//     controls.Keyboard.key.arrowRight.action();
+//   },
+//   controls.Keyboard.key.arrowRight.val,
+//   controls.Keyboard.key.arrowDown.val
+// );
 
 function twoKeysDown(func, key1, key2) {
   var codes = [].slice.call(arguments, 1);
