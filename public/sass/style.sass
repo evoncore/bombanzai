@@ -1,0 +1,155 @@
+
+// Bootstrap
+
+@import '../libs/css/bootstrap-3.3.6-dist/bootstrap.min.css'
+
+
+// Variables
+
+$mt: .2s // Main Transition
+$mf: 'Open Sans' // Main Font
+$af: sans-serif, Arial // Alternative Fonts
+$mc: #CF31D5
+
+
+// Reset
+
+ul
+  margin-bottom: 0
+  padding-left: 0
+  list-style: none
+
+a
+  &:hover, &:focus, &:active
+    text-decoration: none
+    color: #fff
+
+
+// Main Settings
+
+body
+  background-color: #222
+  color: #fff
+  font-size: 1em
+  overflow: hidden
+  height: 100%
+
+nav
+  cursor: default
+
+#message
+  position: absolute
+  bottom: 10%
+  right: 0
+  background-color: rgba(0,0,0,.4)
+  box-sizing: border-box
+  padding: 20px 30px
+  opacity: 0
+  h3
+    font-size: 1.5em
+    margin-top: 0
+    margin-bottom: 10px
+  p
+    margin-bottom: 0
+
+// Aside
+
+aside
+  display: block
+  background-color: #111
+  text-align: center
+  height: 100%
+  z-index: 999
+  .fa
+    font-size: 24px
+  nav
+    li
+      display: block
+    a
+      display: block
+      font: 600 1.5em $mf, $af
+      color: #fff
+      padding: 5px 10px
+      margin: 15px 0
+      transition: $mt
+      &:hover
+        color: $mc
+
+// Game
+
+#game
+  position: relative
+  #game-display
+    position: relative
+    overflow: hidden
+    width: 960px
+    height: 680px
+    max-width: 960px
+    max-height: 680px
+  #grid
+    position: absolute
+    z-index: 2
+    // border-bottom: 1px solid rgba(255,255,255,.2)
+    // border-left: 1px solid rgba(255,255,255,.2)
+    left: 0
+    top: 0
+
+.map-tile
+  width: 20px
+  height: 20px
+  float: left
+  // border-top: 1px solid rgba(255,255,255,.2)
+  // border-right: 1px solid rgba(255,255,255,.2)
+  box-sizing: border-box
+
+.player
+  width: 15px
+  height: 15px
+  background-color: #000
+  position: absolute
+  transition: .1s
+  top: 2px
+  left: 2px
+
+canvas
+  display: block
+  position: absolute
+  top: 130px
+  left: 0
+  background-color: #666
+  overflow: hidden
+  border: 1px solid #fff
+
+
+// Chat
+
+#chat
+  width: 960px
+  background-color: rgba(255,255,255,.1)
+  position: absolute
+
+// Status Bar
+
+#status-bar
+  height: 100%
+  background-color: rgba(255,255,255,.3)
+
+
+#error9001
+  display: block !important
+  position: absolute
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+  font-size: 2em
+  color: red
+  font-weight: bold
+  text-align: center
+  img
+    display: block
+    margin: 10px auto
+
+
+@media screen and (max-width: 991px)
+  body > *
+    display: none
