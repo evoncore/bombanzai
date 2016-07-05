@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./socket/index.js"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "async": "^2.0.0-rc.6",
