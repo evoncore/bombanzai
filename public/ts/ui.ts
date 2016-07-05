@@ -54,12 +54,12 @@ $('aside nav a').on('click', function(e) {
 
 $('#game #game-display').append('<div id="grid"></div>');
 $('#game #game-display #grid').css({
-  width: game.Display.width + 1 + 'px',
-  top: $('canvas').css('margin-top'),
+  width: game.Display.width + 'px',
+  top: 0,
   left: $('canvas').css('left')
 });
 
-for (var i = 0; i < 0; i++) {
+for (var i = 0; i < 0; i++) { // 5000
   $('#game #game-display  #grid').append('<i class="map-tile"></i>');
 }
 

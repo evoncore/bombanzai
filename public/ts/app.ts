@@ -13,6 +13,8 @@
 /// <reference path="gameplay_classes/Bomb.ts"/>
 /// <reference path="gameplay_classes/Wall.ts"/>
 
+/// <reference path="socket.ts"/>
+
 //=== CODE ===//
 
 // DO NOT TOUCH. Not for dynamic generation; initialized in the code

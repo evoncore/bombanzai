@@ -50,11 +50,6 @@ var Player = (function (_super) {
                 else if (vector == 'x') {
                     $('canvas').css({ marginLeft: -coord + 'px' });
                 }
-                $('#game #game-display #grid').css({
-                    width: game.Display.width + 1 + 'px',
-                    top: $('canvas').css('margin-top'),
-                    left: $('canvas').css('left')
-                });
             }
         };
         this.texture = texture;
@@ -99,6 +94,18 @@ var Wall = (function (_super) {
     }
     return Wall;
 }(Block));
+/// <reference path="app.ts"/>
+// end declare
+var socket = io();
+$('#chat form').submit(function () {
+    socket.emit('chat message', $('#user-message').val());
+    $('#user-message').val('');
+    return false;
+});
+var ul = $('#chat ul');
+socket.on('chat message', function (msg) {
+    ul.append('<li>' + msg + '</li>');
+});
 //=== DEPENDING ON ===//
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="../typings/pixi.js/pixi.js.d.ts"/>
@@ -110,6 +117,7 @@ var Wall = (function (_super) {
 /// <reference path="gameplay_classes/Player.ts"/>
 /// <reference path="gameplay_classes/Bomb.ts"/>
 /// <reference path="gameplay_classes/Wall.ts"/>
+/// <reference path="socket.ts"/>
 //=== CODE ===//
 // DO NOT TOUCH. Not for dynamic generation; initialized in the code
 var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
@@ -474,8 +482,8 @@ $('aside nav a').on('click', function (e) {
 // Grid
 $('#game #game-display').append('<div id="grid"></div>');
 $('#game #game-display #grid').css({
-    width: game.Display.width + 1 + 'px',
-    top: $('canvas').css('margin-top'),
+    width: game.Display.width + 'px',
+    top: 0,
     left: $('canvas').css('left')
 });
 for (var i = 0; i < 0; i++) {

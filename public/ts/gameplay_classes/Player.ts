@@ -15,12 +15,6 @@ class Player extends Block
       } else if (vector == 'x') {
         $('canvas').css({ marginLeft: -coord + 'px' });
       }
-
-      $('#game #game-display #grid').css({
-        width: game.Display.width + 1 + 'px',
-        top: $('canvas').css('margin-top'),
-        left: $('canvas').css('left')
-      });
     }
   };
 

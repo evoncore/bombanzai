@@ -14,6 +14,7 @@ var http = require('http');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+console.log('server listening on ' + port);
 
 /**
  * Create HTTP server.
@@ -88,3 +89,5 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+module.exports = server;
