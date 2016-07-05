@@ -44,6 +44,13 @@ body
   min-height: 100%
   position: relative
   font-family: $mf, $af
+  & > *
+    opacity: 0
+
+.show-body
+  & > *
+    transition: .4s
+    opacity: 1
 
 section
   display: none

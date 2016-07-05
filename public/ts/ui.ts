@@ -111,3 +111,7 @@ $(window).on('resize', function() {
   $('body').css({ height: $(window).innerHeight() })
   $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() })
 });
+
+$(document).ready(function() {
+  $('body').addClass('show-body');
+});
