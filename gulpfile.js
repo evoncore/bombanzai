@@ -7,7 +7,7 @@ var gulp = require('gulp'),
 
 gulp.task('ts', function() {
 
-  return gulp.src('public/ts/**/*.ts')
+  return gulp.src('public/ts/*.ts')
     .pipe(ts({
       out: 'app.js'      
     }))

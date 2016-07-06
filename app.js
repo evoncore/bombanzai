@@ -43,11 +43,11 @@ app.use('/', index);
 // app.post('/login', require('./routes/login').post);
 
 // Not working with socket.io
-app.use(function(req, res, next) {
-  req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
-  console.log('visits: ' + req.session.numberOfVisits);
-  res.session.name;
-});
+// app.use(function(req, res, next) {
+//   req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
+//   console.log('visits: ' + req.session.numberOfVisits);
+//   res.session.name;
+// });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
