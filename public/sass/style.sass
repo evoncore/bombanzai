@@ -6,7 +6,7 @@ $mf: 'Exo 2' // Main Font
 $sf: 'Montserrat' // Second Font
 $ap: 'Anonymous Pro' // Anonymous Pro
 $af: sans-serif, Arial // Alternative Fonts
-$mc: #CF31D5 // Main Color
+$mc: #DDFF1F // Main Color #DDFF1F
 
 
 // Reset
@@ -97,10 +97,6 @@ p
   line-height: 25px
 
 
-// Main
-
-main
-  border-left: 3px solid $mc
 
 
 // Aside
@@ -132,6 +128,7 @@ aside
   height: 100%
   width: 100%
   box-sizing: border-box
+  border-right: 3px solid $mc
   .fa
     font-size: 24px
   nav
@@ -203,6 +200,7 @@ canvas
 // bar
 
 #bar
+  border-top: 3px solid $mc
   width: 150%
   background-color: #111
   position: absolute
@@ -218,12 +216,13 @@ canvas
 // Status Bar
 
 #chat
-  background-color: rgba(255,255,255,.3)
+  background-color: #111
   width: 100%
+  border-left: 3px solid $mc
   h1
     text-align: center
     padding-bottom: 15px
-    border-bottom: 2px solid #777
+    color: #fff
   box-sizing: border-box
   padding: 15px 0
   position: relative
@@ -242,7 +241,7 @@ canvas
       &.sys-msg
         font-size: 1.2em
         font-style: italic
-        color: #222
+        color: #fff
 
   form
     position: absolute
