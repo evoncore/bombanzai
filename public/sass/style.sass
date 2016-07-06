@@ -268,13 +268,30 @@ canvas
       float: left
       box-sizing: border-box
       padding: 10px
+      &:focus
+        &::-webkit-input-placeholder
+          color: #fff
+          text-indent: -57px
+        &::-moz-placeholder
+          color: #fff
+          text-indent: -57px
+        &:-moz-placeholder   
+          color: #fff
+          text-indent: -57px
+        &:-ms-input-placeholder
+          color: #fff
+          text-indent: -57px
       &::-webkit-input-placeholder
+        transition: .3s 
         color: #ccc
-      &::-moz-placeholder         
+      &::-moz-placeholder  
+        transition: .3s        
         color: #ccc
-      &:-moz-placeholder          
+      &:-moz-placeholder  
+        transition: .3s         
         color: #ccc
-      &:-ms-input-placeholder     
+      &:-ms-input-placeholder 
+        transition: .3s     
         color: #ccc
     button
       height: 40px
