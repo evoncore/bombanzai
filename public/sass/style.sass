@@ -134,15 +134,16 @@ aside
   nav
     li
       display: block
+      width: 100%
+      border: 6px solid transparent
+      margin: 25px 0
+      text-align: center
     a
       display: block
-      width: 100%
       font: 600 1.5em $mf, $af
       color: #fff
       padding: 5px 10px
-      margin: 15px 0
       transition: $mt
-      border: 6px solid transparent
       &:before
         margin-right: 6px
       &:hover
@@ -150,10 +151,11 @@ aside
     a.exit
       transition: $mt
       &:hover
-        color: #DA1616
+        color: #FF6B6B
     .active
-      color: $mc
       border-right: 6px solid $mc
+      a
+        color: $mc
 
 // Game
 
@@ -241,17 +243,18 @@ canvas
       &.sys-msg
         font-size: 1.2em
         font-style: italic
-        color: #fff
+        color: $mc * 6
 
   form
     position: absolute
     bottom: 0
     width: 100%
+    border-top: 3px solid $mc
     input
       height: 40px
       font-size: 1.4em
       border: 0
-      background-color: #777
+      background-color: #111
       color: #fff
       width: 80%
       float: left
@@ -269,7 +272,7 @@ canvas
       height: 40px
       font-size: 1.4em
       border: 0
-      background-color: #777
+      background-color: #111
       color: #fff
       width: 20%
       float: left
@@ -277,7 +280,7 @@ canvas
       padding: 12px 0
       transition: $mt
       &:hover
-        background-color: #999
+        background-color: #444
 
 
 #error9001

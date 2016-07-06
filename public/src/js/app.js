@@ -461,12 +461,12 @@ function twoKeysDown(func, key1, key2) {
         delete pressed[e.keyCode];
     });
 }
-/// <reference path="../app.ts"/>
+/// <reference path="app.ts"/>
 // One Page App
 $(window).on('gamepadconnection', function (e) {
     console.log('gamepad-connected!');
 });
-$('aside nav a.game').addClass('active');
+$('aside nav li.game').addClass('active');
 location.href = '#/game';
 $('section').stop().fadeOut(200);
 $('#game').stop().fadeIn(200);
@@ -478,10 +478,9 @@ $('aside nav a').on('click', function (e) {
         if (url == null)
             url = 'info';
         location.href = '#/' + url;
-        $(this).addClass('active')
-            .parent()
+        $(this).parent()
+            .addClass('active')
             .siblings()
-            .children('a')
             .removeClass('active');
         $('section').stop().fadeOut(200);
         $('#' + url).stop().fadeIn(200);
@@ -501,10 +500,26 @@ $('aside nav a').on('click', function (e) {
     }
 });
 // Exit Button
-$('aside nav a.exit').on('click', function (e) {
+$('aside nav li.exit a').on('click', function (e) {
     e.preventDefault();
-    var gui = require('nw.gui');
-    gui.App.quit();
+    $.ajax({
+        url: '/',
+        method: 'POST',
+        data: 'exit-app',
+        complete: function () {
+            console.log('exiting...');
+        },
+        statusCode: {
+            200: function () {
+                console.log('done!');
+            },
+            403: function (jqXHR) {
+                var error = JSON.parse(jqXHR.responseText);
+                $('.error', form).html(error.message);
+            }
+        }
+    });
+    return false;
 });
 // Grid
 $('#game #game-display').append('<div id="grid"></div>');
