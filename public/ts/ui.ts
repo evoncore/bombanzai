@@ -33,46 +33,24 @@ $('aside nav a').on('click', function(e) {
     $('#' + url).stop().fadeIn(200);
 
     if (url != 'game') {
-      $('#bar').stop().animate({opacity: 0}, 0);
+      $('#bar').stop().animate({bottom: -$('#bar').innerHeight() }, 300);
       $('#chat').stop().animate({
         height: $('body').innerHeight()
       }, 300);
     } else {
       $('#chat').stop().animate({
-        height: $('#game #game-display').height()
-      }, 300, function() {
-        $('#bar').stop().animate({opacity: 1}, 300);
-      });
+        height: $('#game #game-display').innerHeight()
+      }, 300);
+      $('#bar').stop().animate({bottom: 0}, 300);
     }
   }
 
 });
 
-// Exit Button
 
-$('aside nav li.exit a').on('click', function(e) {
-  e.preventDefault();
+// Exit
 
-  $.ajax({
-    url: '/',
-    method: 'POST',
-    data: 'exit-app',
-    complete: function() {
-      console.log('exiting...');
-    },
-    statusCode: {
-      200: function() {
-         console.log('done!');
-      },
-      403: function(jqXHR) {
-        var error = JSON.parse(jqXHR.responseText);
-        $('.error', form).html(error.message);
-      }
-    }
-  });
-
-  return false;
-});
+$('aside nav li.exit a').on('click', function(e) { e.preventDefault(); });
 
 
 // Grid
@@ -106,7 +84,7 @@ $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight(
 // Chat
 
 $('#chat').css({
-  height: $('#game #game-display').height()
+  height: $('#game #game-display').innerHeight()
 });
 
 
