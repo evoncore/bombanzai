@@ -28,26 +28,26 @@ app.use(express.static(path.join(__dirname, 'public/src')));
 
 app.use('/', index);
 
-// app.use(session({
-//   secret: 'KillerIsJim',
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: {
-//     httpOnly: false,
-//     maxAge: null
-//   },
-//   store: new MongoStore({mongooseConnection: mongoose.connection})
-// }));
+app.use(session({
+  secret: 'KillerIsJim',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: false,
+    maxAge: null
+  },
+  store: new MongoStore({mongooseConnection: mongoose.connection})
+}));
 
-// app.get('/login', require('./routes/login').get);
-// app.post('/login', require('./routes/login').post);
+app.get('/login', require('./routes/login').get);
+app.post('/login', require('./routes/login').post);
 
 // Not working with socket.io
-// app.use(function(req, res, next) {
-//   req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
-//   console.log('visits: ' + req.session.numberOfVisits);
-//   res.session.name;
-// });
+app.use(function(req, res, next) {
+  req.session.numberOfVisits = req.session.numberOfVisits + 1 || 1;
+  console.log('visits: ' + req.session.numberOfVisits);
+  res.session.name;
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
