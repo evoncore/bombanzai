@@ -17,10 +17,10 @@ $('canvas').css({ marginTop: -player_1.camera.y + 'px' });
 $(document).on('keydown', function(e) {
 
   // Disable all default key-events
-  if (e.stopPropagation) {
-    e.stopPropagation();
-    e.preventDefault();
-  }
+  // if (e.stopPropagation) {
+  //   e.stopPropagation();
+  //   e.preventDefault();
+  // }
 
   switch (e.which) {
     case controls.Keyboard.key.arrowDown.val:
