@@ -6,7 +6,8 @@ $mf: 'Exo 2' // Main Font
 $sf: 'Montserrat' // Second Font
 $ap: 'Anonymous Pro' // Anonymous Pro
 $af: sans-serif, Arial // Alternative Fonts
-$mc: #DDFF1F // Main Color #DDFF1F
+$mc: #fff // Main Color #DDFF1F
+$sc: #999 // Second Color
 
 
 // Reset
@@ -21,6 +22,18 @@ $mc: #DDFF1F // Main Color #DDFF1F
 ::-moz-selection
   background-color: $mc
   color: #222
+
+::-webkit-scrollbar
+    width:  5px
+    height: 5px
+    margin-left: 5px
+
+::-webkit-scrollbar-thumb
+    background: #fff
+
+::-webkit-scrollbar-track
+    background: transparent
+
 
 ul
   margin-bottom: 0
@@ -62,12 +75,22 @@ section
   position: absolute
   box-sizing: border-box
   padding: 20px 60px
+  height: 100%
+  overflow-y: auto
+  max-width: 100%
   h1
     margin-bottom: 35px
     font-size: 5em
+  img
+    display: block
+    margin: 25px auto
+  .gameplay-screenshot
+    width: 100%
+    border-radius: 5px
 
 #game
   padding: 0
+  overflow: hidden
 
 nav
   cursor: default

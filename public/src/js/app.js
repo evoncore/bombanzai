@@ -41,8 +41,8 @@ var Player = (function (_super) {
     function Player(texture, x, y) {
         _super.call(this, true);
         this.camera = {
-            x: -460,
-            y: -240,
+            x: -480,
+            y: -280,
             show: function (coord, vector) {
                 if (vector == 'y') {
                     $('canvas').css({ marginTop: -coord + 'px' });
@@ -145,7 +145,7 @@ var exampleWall = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 0, 0);
 var exampleBlock = new Block(false);
 var game = new Game;
 var worldMap = new WorldMap;
-var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 260, 60);
+var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 400, 240);
 var plm_1 = player_1.model;
 var wall_1 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 40);
 var wall_2 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 60);

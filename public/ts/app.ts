@@ -26,7 +26,7 @@ var game = new Game;
 var worldMap = new WorldMap;
 
 
-var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 260, 60);
+var player_1 = new Player(PIXI.Texture.fromImage('../img/eshtu.png'), 400, 240);
 var plm_1 = player_1.model;
 
 var wall_1 = new Wall(PIXI.Texture.fromImage('../img/wall.png'), 80, 40);

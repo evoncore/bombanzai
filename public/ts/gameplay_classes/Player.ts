@@ -7,8 +7,8 @@ class Player extends Block
   speed;
 
   camera = {
-    x: -460,
-    y: -240,
+    x: -480,
+    y: -280,
     show: function(coord, vector) {
       if (vector == 'y') {
         $('canvas').css({ marginTop: -coord + 'px' });
