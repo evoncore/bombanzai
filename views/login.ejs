@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+</head>
+<body>
+  <form id="login" action="/login" method="post">
+    <label for="user-name">Username:</label>
+    <input type="text" id="user-name" name="username">
+    <label for="user-pass">Password:</label>
+    <input type="password" id="user-pass" name="password">
+    <input type="submit">
+  </form>
+  <script src="/libs/js/jquery.min.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

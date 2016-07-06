@@ -96,16 +96,37 @@ var Wall = (function (_super) {
 }(Block));
 /// <reference path="app.ts"/>
 // end declare
-var socket = io();
-$('#chat form').submit(function () {
+var socket = io('', {
+    'reconnection delay': 1,
+    'reconnectionAttempts': 10
+});
+var ul = $('#chat ul');
+var form = $('#chat form');
+form.on('submit', function (e) { e.preventDefault(); });
+socket
+    .on('chat message', function (msg) {
+    ul.append('<li>' + msg + '</li>');
+})
+    .on('connect', function () {
+    ul.append('<li class="sys-msg">Соединение установлено</li>');
+    ;
+    form.on('submit', sendMessage);
+})
+    .on('disconnect', function () {
+    ul.append('<li class="sys-msg">Соединение потеряно</li>');
+    ;
+    form.on('submit', function (e) { e.preventDefault(); });
+})
+    .on('reconnect_failed', function () {
+    ul.append('<li class="sys-msg">Соединение закрыто</li>');
+    ;
+});
+function sendMessage() {
     socket.emit('chat message', $('#user-message').val());
     $('#user-message').val('');
     return false;
-});
-var ul = $('#chat ul');
-socket.on('chat message', function (msg) {
-    ul.append('<li>' + msg + '</li>');
-});
+}
+;
 //=== DEPENDING ON ===//
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="../typings/pixi.js/pixi.js.d.ts"/>
@@ -147,7 +168,7 @@ function animate() {
 plm_1.canMove = new Object;
 /// <reference path="hotkeys.ts"/>
 // UI
-/// <reference path="ui.ts"/> 
+/// <reference path="client/ui.ts"/> 
 var Controls = (function () {
     function Controls() {
         this.Keyboard = {
@@ -440,7 +461,32 @@ function twoKeysDown(func, key1, key2) {
         delete pressed[e.keyCode];
     });
 }
-/// <reference path="app.ts"/>
+/// <reference path="../../typings/jquery/jquery.d.ts"/>
+$('#login').on('submit', function () {
+    var form = $(this);
+    $('.error', form).html('');
+    $(':submit', form).button('loading');
+    $.ajax({
+        url: '/login',
+        method: 'POST',
+        data: form.serialize(),
+        complete: function () {
+            $(':submit', form).button('reset');
+        },
+        statusCode: {
+            200: function () {
+                form.html('Вы вошли на сайт').addClass('alert-success');
+                window.location.href = '/';
+            },
+            403: function (jqXHR) {
+                var error = JSON.parse(jqXHR.responseText);
+                $('.error', form).html(error.message);
+            }
+        }
+    });
+    return false;
+});
+/// <reference path="../app.ts"/>
 // One Page App
 $(window).on('gamepadconnection', function (e) {
     console.log('gamepad-connected!');
@@ -451,7 +497,7 @@ $('section').stop().fadeOut(200);
 $('#game').stop().fadeIn(200);
 $('aside nav a').on('click', function (e) {
     e.preventDefault();
-    if (!(this.classList.contains('active'))) {
+    if (!(this.classList.contains('active')) && !(this.classList.contains('exit'))) {
         var urlPattern = /[a-z]+$/g;
         var url = this.href.match(urlPattern);
         if (url == null)
@@ -478,6 +524,12 @@ $('aside nav a').on('click', function (e) {
             });
         }
     }
+});
+// Exit Button
+$('aside nav a.exit').on('click', function (e) {
+    e.preventDefault();
+    var gui = require('nw.gui');
+    gui.App.quit();
 });
 // Grid
 $('#game #game-display').append('<div id="grid"></div>');

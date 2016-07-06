@@ -1,4 +1,4 @@
-/// <reference path="app.ts"/>
+/// <reference path="../app.ts"/>
 
 // One Page App
 
@@ -15,7 +15,7 @@ $('aside nav a').on('click', function(e) {
 
   e.preventDefault();
 
-  if (!(this.classList.contains('active'))) {
+  if (!(this.classList.contains('active')) && !(this.classList.contains('exit'))) {
     let urlPattern = /[a-z]+$/g;
     let url = this.href.match(urlPattern);
 
@@ -47,6 +47,15 @@ $('aside nav a').on('click', function(e) {
     }
   }
 
+});
+
+// Exit Button
+
+$('aside nav a.exit').on('click', function(e) {
+  e.preventDefault();
+
+  var gui = require('nw.gui');
+  gui.App.quit();
 });
 
 
