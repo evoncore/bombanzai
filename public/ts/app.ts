@@ -60,4 +60,4 @@ plm_1.canMove = new Object;
 
 // UI
 
-/// <reference path="client/ui.ts"/>
+/// <reference path="ui.ts"/>

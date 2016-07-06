@@ -32,7 +32,7 @@ server.on('listening', onListening);
 
 // Socket IO
 
-// require('../socket')(server);
+require('../socket')(server);
 
 /**
  * Normalize a port into a number, string, or false.
