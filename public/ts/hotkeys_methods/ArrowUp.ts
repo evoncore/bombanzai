@@ -6,29 +6,85 @@ function keyArrowUp() {
 
     pressed: function() {
 
-      if (plm_1.position.y > 0) {
-        plm_1.canMove.Up = true;
+      var objects = [];
+      var blocked_objects = [];
 
-        if (exampleWall.blocked) {
-          for (var i = 0; i < worldMap.containers.walls.children.length; i++) {
-            if (plm_1.position.x != worldMap.containers.walls.children[i].position.x || plm_1.position.y != (worldMap.containers.walls.children[i].position.y + exampleWall.size)) {
-            } else {
-              plm_1.canMove.Up = false;
+      player_1.canMove.Up = true;
+
+      function createArrays(callback) {
+
+        // Add Objects
+        for (let key in WORLD_MAP.containers) {
+          let push = false;
+
+          for (let key2 in WORLD_MAP.containers[key].children) {
+            if (WORLD_MAP.containers[key].children[key2]) {
+              push = true;
             }
           }
 
-          if (plm_1.canMove.Up) {
-            plm_1.position.y -= 1 * player_1.speed;
-            player_1.camera.y -= 1 * player_1.speed;
+          for (let key3 in WORLD_MAP.containers[key].children) {
+            if (push && WORLD_MAP.containers[key].children[key3] != 0) {
+              objects.push(WORLD_MAP.containers[key].children[key3]);
+            }
+          }
+        }
+
+        // Add Blocked Objects without player
+        for (let key in WORLD_MAP.containers) {
+          let push = false;
+
+          for (let key2 in WORLD_MAP.containers[key].children) {
+            if (WORLD_MAP.containers[key].children[key2].blocked) {
+              push = true;
+            }
           }
 
-          player_1.camera.show(player_1.camera.y, 'y');
-        } else {
-          plm_1.position.y -= 1 * player_1.speed;
-          player_1.camera.y -= 1 * player_1.speed;
-          player_1.camera.show(player_1.camera.y, 'y');
+          for (let key3 in WORLD_MAP.containers[key].children) {
+            if (push && WORLD_MAP.containers[key].children[key3]._a_name != 'player') {
+              blocked_objects.push(WORLD_MAP.containers[key].children[key3]);
+            }
+          }
         }
+
+        callback();
       }
+
+      createArrays(function() {
+
+        for (var j = 0; j < blocked_objects.length; j++) {
+
+          if (blocked_objects[j].blocked) {
+            for (var i = 0; i < objects.length; i++) {
+              if (!(player_1.model.position.x != objects[i].position.x ||
+                    player_1.model.position.y != (objects[i].position.y + blocked_objects[j].size)))
+              {
+                player_1.canMove.Up = false;
+              }
+            }
+          } else {
+            for (var i = 0; i < objects[j].children.length; i++) {
+              if (!(player_1.model.position.x != objects[i].position.x ||
+                    player_1.model.position.y != (objects[i].position.y + blocked_objects[j].size)))
+              {
+
+                player_1.canMove.Up = true;
+              }
+            }
+          }
+
+        } // End main For
+
+        if (player_1.canMove.Up && player_1.model.position.y > 0) {
+          player_1.model.position.y -= 1 * player_1.speed;
+          if (GAME.Display.scroll) {      
+            player_1.camera.y -= 1 * player_1.speed;
+            player_1.camera.move(player_1.camera.y, 'y');
+          }
+        }
+
+      });
+
     }
 
   }

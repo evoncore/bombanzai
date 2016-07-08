@@ -6,129 +6,132 @@
 /// <reference path="hotkeys_methods/ArrowLeft.ts"/>
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
 
-var controls = new Controls;
-var bomb;
+  const CONTROLS = new Controls;
+  var bomb;
+  let two_keys = false;
 
-player_1.camera.x += plm_1.position.x;
-player_1.camera.y += plm_1.position.y 
-$('canvas').css({ marginLeft: -player_1.camera.x + 'px' });
-$('canvas').css({ marginTop: -player_1.camera.y + 'px' });
-
-$(document).on('keydown', function(e) {
-
-  // Disable all default key-events
-  // if (e.stopPropagation) {
-  //   e.stopPropagation();
-  //   e.preventDefault();
-  // }
-
-  switch (e.which) {
-    case controls.Keyboard.key.arrowDown.val:
-        ////
-        // if (!two_keys) {
-          controls.Keyboard.key.arrowDown.action();
-        // }
-        ////
-      break;
-    case controls.Keyboard.key.arrowUp.val:
-        ////
-        // if (!two_keys) {
-          controls.Keyboard.key.arrowUp.action();
-        // }
-        ////
-      break;
-    case controls.Keyboard.key.arrowRight.val:
-        ////
-        // if (!two_keys) {
-          controls.Keyboard.key.arrowRight.action();
-        // }
-        ////
-      break;
-    case controls.Keyboard.key.arrowLeft.val:
-        ////
-        // if (!two_keys) {
-          controls.Keyboard.key.arrowLeft.action();
-        // }
-        ////
-      break;
-    case controls.Keyboard.key.Spacebar.val:
-        ////
-        controls.Keyboard.key.Spacebar.action();
-        ////
-      break;
-  }
-
-});
-
-
-
-// // Top Left
-
-// twoKeysDown(
-//   function() {
-//     controls.Keyboard.key.arrowUp.action();
-//     controls.Keyboard.key.arrowLeft.action();
-//   },
-//   controls.Keyboard.key.arrowUp.val,
-//   controls.Keyboard.key.arrowLeft.val
-// );
-
-// // Top Right
-
-// twoKeysDown(
-//   function() {
-//     controls.Keyboard.key.arrowUp.action();
-//     controls.Keyboard.key.arrowRight.action();
-//   },
-//   controls.Keyboard.key.arrowUp.val,
-//   controls.Keyboard.key.arrowRight.val
-// );
-
-// // Bottom Left
-
-// twoKeysDown(
-//   function() {
-//     controls.Keyboard.key.arrowDown.action();
-//     controls.Keyboard.key.arrowLeft.action();
-//   },
-//   controls.Keyboard.key.arrowDown.val,
-//   controls.Keyboard.key.arrowLeft.val
-// );
-
-// // Bottom Right
-
-// twoKeysDown(
-//   function() {
-//     controls.Keyboard.key.arrowDown.action();
-//     controls.Keyboard.key.arrowRight.action();
-//   },
-//   controls.Keyboard.key.arrowRight.val,
-//   controls.Keyboard.key.arrowDown.val
-// );
-
-function twoKeysDown(func, key1, key2) {
-  var codes = [].slice.call(arguments, 1);
-
-  var pressed = {};
+  player_1.camera.x += player_1.model.position.x;
+  player_1.camera.y += player_1.model.position.y 
+  $('canvas').css({ 
+                    marginLeft: -player_1.camera.x + 'px', 
+                    marginTop: -player_1.camera.y + 'px'
+                  });
 
   $(document).on('keydown', function(e) {
 
-    pressed[e.keyCode] = true;
+    // Disable all default key-events
+    // if (e.stopPropagation) {
+    //   e.stopPropagation();
+    //   e.preventDefault();
+    // }
 
-      for (var i = 0; i < codes.length; i++) {
-        if (!pressed[codes[i]]) {
-          return;
-        }
-      }
-
-    // if want one click
-    // pressed = {};
-    func();
+    switch (e.which) {
+      case CONTROLS.Keyboard.key.arrowDown.val:
+          ////
+          if (!two_keys) {
+            CONTROLS.Keyboard.key.arrowDown.action();
+          }
+          ////
+        break;
+      case CONTROLS.Keyboard.key.arrowUp.val:
+          ////
+          if (!two_keys) {
+            CONTROLS.Keyboard.key.arrowUp.action();
+          }
+          ////
+        break;
+      case CONTROLS.Keyboard.key.arrowRight.val:
+          ////
+          if (!two_keys) {
+            CONTROLS.Keyboard.key.arrowRight.action();
+          }
+          ////
+        break;
+      case CONTROLS.Keyboard.key.arrowLeft.val:
+          ////
+          if (!two_keys) {
+            CONTROLS.Keyboard.key.arrowLeft.action();
+          }
+          ////
+        break;
+      case CONTROLS.Keyboard.key.Spacebar.val:
+          ////
+          CONTROLS.Keyboard.key.Spacebar.action();
+          ////
+        break;
+    }
 
   });
 
-  $(document).on('keyup', function(e) {
-    delete pressed[e.keyCode];
-  });
 
-}
+  // Top Left
+
+  // twoKeysDown(
+  //   function() {
+  //     CONTROLS.Keyboard.key.arrowUp.action();
+  //     CONTROLS.Keyboard.key.arrowLeft.action();
+  //   },
+  //   CONTROLS.Keyboard.key.arrowUp.val,
+  //   CONTROLS.Keyboard.key.arrowLeft.val
+  // );
+
+  // // Top Right
+
+  // twoKeysDown(
+  //   function() {
+  //     CONTROLS.Keyboard.key.arrowUp.action();
+  //     CONTROLS.Keyboard.key.arrowRight.action();
+  //   },
+  //   CONTROLS.Keyboard.key.arrowUp.val,
+  //   CONTROLS.Keyboard.key.arrowRight.val
+  // );
+
+  // // Bottom Left
+
+  // twoKeysDown(
+  //   function() {
+  //     CONTROLS.Keyboard.key.arrowDown.action();
+  //     CONTROLS.Keyboard.key.arrowLeft.action();
+  //   },
+  //   CONTROLS.Keyboard.key.arrowDown.val,
+  //   CONTROLS.Keyboard.key.arrowLeft.val
+  // );
+
+  // // Bottom Right
+
+  // twoKeysDown(
+  //   function() {
+  //     CONTROLS.Keyboard.key.arrowDown.action();
+  //     CONTROLS.Keyboard.key.arrowRight.action();
+  //   },
+  //   CONTROLS.Keyboard.key.arrowRight.val,
+  //   CONTROLS.Keyboard.key.arrowDown.val
+  // );
+
+  // function twoKeysDown(func, key1, key2) {
+  //   var codes = [].slice.call(arguments, 1);
+  //   var pressed = {};
+
+  //   $(document).on('keydown', function(e) {
+
+  //     pressed[e.keyCode] = true;
+  //     two_keys = true;
+
+  //     for (var i = 0; i < codes.length; i++) {
+  //       if (!pressed[codes[i]]) {
+  //         return;
+  //       }
+  //     }
+
+  //     // only one click
+  //     // pressed = {};
+  //     func();
+
+  //   });
+
+  //   $(document).on('keyup', function(e) {
+  //     two_keys = false;
+  //     delete pressed[e.keyCode];
+  //   });
+
+  // }

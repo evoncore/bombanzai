@@ -1,18 +1,8 @@
 /// <reference path="app.ts"/>
 
-// for typescript
-declare var io : {
-  connect(url: string): Socket;
-}
-interface Socket {
-  on(event: string, callback: (data: any) => void );
-  emit(event: string, data: any);
-}
-// end declare
-
 var socket = io('', {
-  'reconnection delay': 1,
-  'reconnectionAttempts': 10
+  'reconnectionDelay': 1,
+  'reconnectionAttempts': 2
 });
 
 let ul = $('#chat ul');
@@ -24,9 +14,16 @@ socket
   .on('chat message', function(msg) {
     ul.append('<li>' + msg + '</li>');
   })
+  .on('player moving', function(player_coords) {
+    
+  })
   .on('connect', function() {
     ul.append('<li class="sys-msg">Соединение установлено</li>');;
     form.on('submit', sendMessage);
+
+    // socket.emit('player moving', function() {
+      
+    // });
   })
   .on('disconnect', function() {
     ul.append('<li class="sys-msg">Соединение потеряно</li>');;
@@ -40,4 +37,4 @@ function sendMessage() {
   socket.emit('chat message', $('#user-message').val());
   $('#user-message').val('');
   return false;
-});
+};

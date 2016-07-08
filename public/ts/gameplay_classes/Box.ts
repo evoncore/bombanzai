@@ -1,16 +1,11 @@
 
-class Bomb extends Block
+class Box extends Block
 {
 
   texture;
   model;
-  waveLevel = {
-    size: null,
-    level: 1,
-    wave: null
-  };
 
-  constructor(texture, x, y, lvl) {
+  constructor(texture, x, y) {
     super({
       blocked: true,
       destroy: true
@@ -20,20 +15,17 @@ class Bomb extends Block
 
     this.model = new PIXI.Sprite(this.texture);
 
-    this.model._a_name = 'bomb'; 
+    this.model._a_name = 'box'; 
 
     this.model.position.x = x;
     this.model.position.y = y;
+
     this.model.width = this.size;
     this.model.height = this.size;
 
     this.model.size = this.size;
     this.model.blocked = this.blocked;
     this.model.destroy = this.destroy;
-
-    this.waveLevel.size = this.size;
-    this.waveLevel.level = lvl;
-    this.waveLevel.wave = this.waveLevel.size * this.waveLevel.level;
-  };
+  }
 
 }

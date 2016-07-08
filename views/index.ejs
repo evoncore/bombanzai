@@ -1,15 +1,99 @@
 <% include partials/header %>
 
   <section id="info">
-    <h1>О проекте</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam quaerat at quo. Culpa possimus tenetur, cum sint facere, nam veniam ipsa repellat molestiae! Quod ipsum cum laudantium, sed! Cupiditate sed, omnis in repudiandae, animi vitae dignissimos, sapiente aut, quibusdam soluta dicta nobis explicabo quas fugit aliquid aperiam. Ipsa dolores vel officiis et temporibus? Deserunt voluptates quas iure ipsa dolor sit magnam quidem, illum illo fugit! Amet expedita quidem quos cumque, ut esse quaerat! Iure ea facere explicabo quod placeat reiciendis iste rerum impedit recusandae quo vel veritatis, sint voluptates quam vero fuga! Perferendis nisi a quasi qui error, dolorum est in beatae, veritatis alias, deleniti odit nihil. Culpa debitis dolore in velit tempora eius voluptas ex, reiciendis, modi, ipsum ipsam illum ad. Hic itaque minus at mollitia aperiam voluptates repellat.</p>
-    <img src="/img/keyboard-arrows.png" alt="arrows">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Exercitationem magni ea temporibus placeat officiis iste sequi. Cum aliquam laudantium, cumque exercitationem fugit rerum voluptatem dolor placeat eveniet sequi sapiente labore natus delectus ea deserunt totam tempore maxime praesentium aliquid recusandae magni eius. Optio accusamus nesciunt ullam, dolore, et ipsam. Optio.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Veniam quam blanditiis quod perferendis non ducimus expedita unde fugit dolorem atque.</p>
-    <img src="/img/gameplay-screenshot.png" alt="screen" class="gameplay-screenshot">
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus sequi soluta nam minima, dolorum dignissimos rem totam ea, distinctio deleniti quidem! Accusamus quisquam, rem eaque placeat earum facere maiores ad officia similique non dolore dolorum asperiores, expedita animi quae alias?</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laboriosam culpa non, hic rem molestiae possimus impedit esse dolores iste omnis! Asperiores, ex aut, dolore nostrum eius quisquam tempora iste nobis. Necessitatibus numquam eos corporis tenetur illum voluptatum, deserunt rem. Ab delectus, quae. Fugiat vitae doloribus molestias voluptas deleniti magnam, ea nam! Eligendi fugit, repellat soluta, eum quod tempore. Neque, aut.</p>
+    <div id="about">
+      <h1>О проекте</h1>
+      <img src="img/klich-1.jpg" alt="klich" class="klich">
+      <p>Проект <b>"Bombanzai!"</b> является по истине уникальным явлением. Возрожденная легенды (бомбермен) в онлайн баталиях с возможность игры 1x1, 2x2, 3x3, 4x4 и обновленым геймплеем - который добавил не мало нововведений по части возможности кооперироваться в сражении.</p>
+      <p>Также важнейшим нововведением является возможность выбора персонажей. Персонажи играют ключевую роль в геймплее. Именно от того как вы сможете со своими союзниками собрать команду из персонажей и зависит победа.</p>
+      <p>Зайдя в игру, вы не только сможете выбрать персонажа по душе и стилю (кооперируюсь с союзниками), а также, выбрать режим игры подходящий именно вам. Коих в игре достаточно:</p>
+      <ul>
+        <li>Одиночная игра</li>
+        <li>Кооперативное прохождение</li>
+        <li>Лобби</li>
+        <li>Обычная игра</li>
+        <li>Рейтинговая игра</li>
+      </ul>
+      <h3>Одиночная игра</h3>
+        <p>Описание...</p>
+      <h3>Кооперативное прохождение</h3>
+        <p>Описание...</p>
+      <h3>Лобби</h3>
+        <p>Описание...</p>
+      <h3>Обычная игра</h3>
+        <p>Описание...</p>
+      <h3>Рейтинговая игра</h3>
+        <p>Описание...</p>
+    </div>
+    <hr>
+
+    <div id="ui">
+      <h2>Интерфейс</h2>
+      <h3>Игровые объекты:</h3>
+        <div class="object">
+          <img src="img/eshtu.png" alt="player">
+          <span>Игрок</span>
+          <ul>
+            <li>Походимость: <i>Нет</i></li>
+            <li>Разрушаемость: <i>Да</i></li>
+          </ul>
+          <p>Так выглядит моделька игрока. Руководство по управлению моделькой - читайте в разделе управления: <a href="#controls-info">ниже</a></p>
+        </div>
+        <div class="object">
+          <img src="img/bomb.png" alt="bomb">
+          <span>Бомба</span>
+          <ul>
+            <li>Походимость: <i>Нет</i></li>
+            <li>Разрушаемость: <i>Да</i></li>
+          </ul>
+          <p>При взрыве, бомба пускает волну по вертикали и горизонтали. Чем мощнее бомба, тем больше клеток она задевает. По умолчанию: волна задевает по одной клетке по вертикали и горизонтали. Волна способна разрушить ящик. Руководство по установке моделькой читайте в разделе управления: <a href="#controls-info">ниже</a></p>
+        </div>
+        <div class="object">
+          <img src="img/wall.png" alt="wall">
+          <span>Стена</span>
+          <ul>
+            <li>Походимость: <i>Нет</i></li>
+            <li>Разрушаемость: <i>Нет</i></li>
+          </ul>
+        </div>
+        <div class="object">
+          <img src="img/box.png" alt="box">
+          <span>Ящик </span>
+          <ul>
+            <li>Походимость: <i>Нет</i></li>
+            <li>Разрушаемость: <i>Да</i></li>
+          </ul>
+          <p>Из ящика могут выпадать всякие ништяки (нет)</p>:D
+        </div>
+        <h3>Вот так выглядит полная картина интерфейс:</h3>
+        <img src="/img/gameplay-screenshot.png" alt="screen" class="gameplay-screenshot">
+    </div>
+    <hr>
+    <div id="controls-info">
+      <h2>Управление</h2>
+      <p>Управление вы можете осуществлять посредством надавливания конечностей своих конечностей на стрелки которые (по идее) должны находится справа на вашей клавиатуре.</p>
+      <img src="/img/keyboard-arrows.png" alt="arrows">
+      <p>Ежели при надавливании ничего не происходит:</p>
+      <ol>
+        <li>Надавливание производится не на те клавиши.</li>
+        <li>Дисплей игры потерял фокус, и требует нажатие на него.</li>
+        <li>Возможно разработчик криворукий и вам нужно это ему сказать.</li>
+      </ol>
+    </div>
+    <!-- <hr> -->
+    <!-- <div id="future">
+      <img src="img/klich-2.jpg" alt="klich-2" class="klich">
+      <h2>Но мы можем</h2>
+      :D
+      <h3>О ближайших планах на будущее:</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores earum, ratione impedit architecto necessitatibus dolores, molestias dolore quas vitae delectus, nemo placeat sed soluta sit distinctio iure accusantium repudiandae, reiciendis corporis porro esse rem. Nulla, illo totam delectus quis praesentium. Optio animi, nulla ullam tempore reiciendis laborum maiores placeat nemo?</p>
+    </div> -->
+    <div class="footer">
+      <span>Bombanzai! &copy; 2016</span>
+    </div>
   </section>
+
+
   <section id="game"></section>
   <section id="settings">
     <h1>Настройки</h1>

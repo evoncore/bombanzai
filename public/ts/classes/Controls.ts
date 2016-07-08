@@ -5,25 +5,25 @@ class Controls
   Keyboard = { 
     key: {
       arrowUp: {
-        val: 38,
+        val: 38, // 87
         action: function() {
           keyArrowUp().pressed();
         }
       },
       arrowDown: {
-        val: 40,
+        val: 40, // 83
         action: function() {
           keyArrowDown().pressed();
         }
       },
       arrowLeft: {
-        val: 37,
+        val: 37, // 65
         action: function() {
           keyArrowLeft().pressed();
         }
       },
       arrowRight: {
-        val: 39,
+        val: 39, // 68
         action: function() {
           keyArrowRight().pressed();
         }
