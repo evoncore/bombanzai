@@ -15,6 +15,8 @@
 /// <reference path="gameplay_classes/Wall.ts"/>
 /// <reference path="gameplay_classes/Box.ts"/>
 
+/// <reference path="gameplay_classes/landscape/Sand.ts"/>
+
 //=== CODE ===//
 
 /// <reference path="example_blocks.ts"/>
@@ -22,8 +24,8 @@
 const GAME = new Game;
 const WORLD_MAP = new WorldMap;
 
-var playerTexture = PIXI.Texture.fromImage('../img/eshtu.png');
-var player_1 = new Player(playerTexture, 80, 60);
+var player_1 = new Player({ x: 0, y: 0 });
+var player_2 = new Player({ x: 240, y: 240 }, PIXI.Texture.fromImage('../img/player_2.png'));
 
 /// <reference path="map.ts"/>
 
@@ -38,8 +40,8 @@ function animate() {
 }
 
 
+/// <reference path="socket/socket.ts"/>
 /// <reference path="hotkeys.ts"/>
-/// <reference path="socket.ts"/>
 
 
 

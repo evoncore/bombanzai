@@ -11,4 +11,11 @@ class WorldMap
     boxes: new PIXI.Container()
   };
 
+  landscape = {
+    earth: new PIXI.Container(),
+    water: new PIXI.Container(),
+    jungle: new PIXI.Container(),
+    sand: new PIXI.Container()
+  };
+
 }

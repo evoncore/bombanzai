@@ -1,4 +1,4 @@
-/// <reference path="app.ts"/>
+/// <reference path="../app.ts"/>
 
 var socket = io('', {
   'reconnectionDelay': 1,
@@ -14,16 +14,19 @@ socket
   .on('chat message', function(msg) {
     ul.append('<li>' + msg + '</li>');
   })
-  .on('player moving', function(player_coords) {
-    
-  })
   .on('connect', function() {
     ul.append('<li class="sys-msg">Соединение установлено</li>');;
     form.on('submit', sendMessage);
 
-    // socket.emit('player moving', function() {
-      
-    // });
+    socket.emit('player moving', player_1.model.position);
+    socket
+      .on('player coords', function(player_coords) {
+        player_1.model.position.x = player_coords.x;
+        player_1.model.position.y = player_coords.y;
+      });
+
+    socket.emit('user cookie', document.cookie);
+    console.log(document.cookie);
   })
   .on('disconnect', function() {
     ul.append('<li class="sys-msg">Соединение потеряно</li>');;

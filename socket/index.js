@@ -11,6 +11,15 @@ module.exports = function(server) {
       socket.broadcast.emit('chat message', msg);
     });
 
+    socket.on('player moving', function(coords) {
+      socket.emit('player coords', coords);
+      socket.broadcast.emit('player coords', coords);
+    });
+
+    socket.on('user cookie', function(cookie) {
+      console.log(cookie);
+    });
+
     socket.on('disconnect', function() {
       console.log('user disconnected');
     });

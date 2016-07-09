@@ -1,4 +1,5 @@
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 
 function keyArrowDown() {
 
@@ -67,7 +68,6 @@ function keyArrowDown() {
               if (!(player_1.model.position.x != objects[i].position.x ||
                     player_1.model.position.y != (objects[i].position.y - blocked_objects[j].size)))
               {
-
                 player_1.canMove.Down = true;
               }
             }
@@ -83,9 +83,11 @@ function keyArrowDown() {
           }
         }
 
+        socket.emit('player moving', player_1.model.position);
+
       });
 
-    }
+    } /// End Pressed Function
 
   } // End Return
 

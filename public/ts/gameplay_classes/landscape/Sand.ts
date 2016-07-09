@@ -1,18 +1,18 @@
 
-class Wall extends Block
+class Sand extends Block
 {
 
-  texture = PIXI.Texture.fromImage('../img/wall.png');
+  texture = PIXI.Texture.fromImage('../img/sand.png');
   model;
 
   constructor(params) {
     super({
-      blocked: true,
+      blocked: false,
       destroy: false
     });
 
     this.model = new PIXI.Sprite(this.texture);
-    this.model._a_name = 'wall'; 
+    this.model._a_name = 'sand'; 
 
     this.model.position.x = params.x;
     this.model.position.y = params.y;

@@ -11,7 +11,7 @@
   let two_keys = false;
 
   player_1.camera.x += player_1.model.position.x;
-  player_1.camera.y += player_1.model.position.y 
+  player_1.camera.y += player_1.model.position.y;
   $('canvas').css({ 
                     marginLeft: -player_1.camera.x + 'px', 
                     marginTop: -player_1.camera.y + 'px'

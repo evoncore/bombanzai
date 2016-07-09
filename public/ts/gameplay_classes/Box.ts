@@ -2,23 +2,20 @@
 class Box extends Block
 {
 
-  texture;
+  texture = PIXI.Texture.fromImage('../img/box.png');
   model;
 
-  constructor(texture, x, y) {
+  constructor(params) {
     super({
       blocked: true,
       destroy: true
     });
 
-    this.texture = texture;
-
     this.model = new PIXI.Sprite(this.texture);
-
     this.model._a_name = 'box'; 
 
-    this.model.position.x = x;
-    this.model.position.y = y;
+    this.model.position.x = params.x;
+    this.model.position.y = params.y;
 
     this.model.width = this.size;
     this.model.height = this.size;

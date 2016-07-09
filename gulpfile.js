@@ -9,7 +9,8 @@ gulp.task('ts', function() {
 
   return gulp.src('public/ts/*.ts')
     .pipe(ts({
-      out: 'app.js'      
+      target: 'ES5',
+      out: 'app.js'   
     }))
     .pipe(gulp.dest('public/src/js/'))
 

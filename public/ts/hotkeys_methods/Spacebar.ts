@@ -53,7 +53,7 @@ function keySpacebar() {
 
         if (WORLD_MAP.containers.bombs.children.length === 0)
         {
-          bomb = new Bomb(bombTexture, player_1.model.position.x, player_1.model.position.y, 1);
+          bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
           WORLD_MAP.containers.bombs.addChild(bomb.model);
 
           if (bomb) {
@@ -102,7 +102,7 @@ function keySpacebar() {
         else if (player_1.model.position.x !== bomb.model.position.x || player_1.model.position.y !== bomb.model.position.y)
 
         {
-          bomb = new Bomb(bombTexture, player_1.model.position.x, player_1.model.position.y, 1);
+          bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
           WORLD_MAP.containers.bombs.addChild(bomb.model);
 
           if (bomb) {

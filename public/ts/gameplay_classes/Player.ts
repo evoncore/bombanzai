@@ -6,21 +6,24 @@ class Player extends Block
   model;
   speed;
   alive = true;
+  bombsCount = 3;
+  coords = {
+    x: null,
+    y: null
+  }
 
-  constructor(texture, x, y) {
+  constructor(params, texture = PIXI.Texture.fromImage('../img/player_1.png')) {
     super({
       blocked: true,
       destroy: true
     });
 
     this.texture = texture;
-
     this.model = new PIXI.Sprite(this.texture);
-
     this.model._a_name = 'player'; 
 
-    this.model.position.x = x;
-    this.model.position.y = y;
+    this.model.position.x = params.x;
+    this.model.position.y = params.y;
 
     this.model.width = this.size;
     this.model.height = this.size;
@@ -30,6 +33,9 @@ class Player extends Block
     this.model.destroy = this.destroy;
 
     this.speed = this.size;
+
+    this.coords.x = params.x;
+    this.coords.y = params.y;
   };
 
   canMove = {

@@ -83,6 +83,8 @@ function keyArrowRight() {
           }
         }
 
+        socket.emit('player moving', player_1.model.position);
+
       });
     }
 

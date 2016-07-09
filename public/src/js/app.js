@@ -25,6 +25,12 @@ var WorldMap = (function () {
             walls: new PIXI.Container(),
             boxes: new PIXI.Container()
         };
+        this.landscape = {
+            earth: new PIXI.Container(),
+            water: new PIXI.Container(),
+            jungle: new PIXI.Container(),
+            sand: new PIXI.Container()
+        };
     }
     return WorldMap;
 }());
@@ -40,12 +46,18 @@ var Block = (function () {
 }());
 var Player = (function (_super) {
     __extends(Player, _super);
-    function Player(texture, x, y) {
+    function Player(params, texture) {
+        if (texture === void 0) { texture = PIXI.Texture.fromImage('../img/player_1.png'); }
         _super.call(this, {
             blocked: true,
             destroy: true
         });
         this.alive = true;
+        this.bombsCount = 3;
+        this.coords = {
+            x: null,
+            y: null
+        };
         this.canMove = {
             Up: true,
             Down: true,
@@ -67,42 +79,44 @@ var Player = (function (_super) {
         this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'player';
-        this.model.position.x = x;
-        this.model.position.y = y;
+        this.model.position.x = params.x;
+        this.model.position.y = params.y;
         this.model.width = this.size;
         this.model.height = this.size;
         this.model.size = this.size;
         this.model.blocked = this.blocked;
         this.model.destroy = this.destroy;
         this.speed = this.size;
+        this.coords.x = params.x;
+        this.coords.y = params.y;
     }
     ;
     return Player;
 }(Block));
 var Bomb = (function (_super) {
     __extends(Bomb, _super);
-    function Bomb(texture, x, y, lvl) {
+    function Bomb(params) {
         _super.call(this, {
             blocked: true,
             destroy: true
         });
+        this.texture = PIXI.Texture.fromImage('../img/bomb.png');
         this.waveLevel = {
             size: null,
             level: 1,
             wave: null
         };
-        this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'bomb';
-        this.model.position.x = x;
-        this.model.position.y = y;
+        this.model.position.x = params.x;
+        this.model.position.y = params.y;
         this.model.width = this.size;
         this.model.height = this.size;
         this.model.size = this.size;
         this.model.blocked = this.blocked;
         this.model.destroy = this.destroy;
         this.waveLevel.size = this.size;
-        this.waveLevel.level = lvl;
+        this.waveLevel.level = params.waveLevel;
         this.waveLevel.wave = this.waveLevel.size * this.waveLevel.level;
     }
     ;
@@ -110,16 +124,16 @@ var Bomb = (function (_super) {
 }(Block));
 var Wall = (function (_super) {
     __extends(Wall, _super);
-    function Wall(texture, x, y) {
+    function Wall(params) {
         _super.call(this, {
             blocked: true,
-            destroy: true
+            destroy: false
         });
-        this.texture = texture;
+        this.texture = PIXI.Texture.fromImage('../img/wall.png');
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'wall';
-        this.model.position.x = x;
-        this.model.position.y = y;
+        this.model.position.x = params.x;
+        this.model.position.y = params.y;
         this.model.width = this.size;
         this.model.height = this.size;
         this.model.size = this.size;
@@ -130,16 +144,16 @@ var Wall = (function (_super) {
 }(Block));
 var Box = (function (_super) {
     __extends(Box, _super);
-    function Box(texture, x, y) {
+    function Box(params) {
         _super.call(this, {
             blocked: true,
             destroy: true
         });
-        this.texture = texture;
+        this.texture = PIXI.Texture.fromImage('../img/box.png');
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'box';
-        this.model.position.x = x;
-        this.model.position.y = y;
+        this.model.position.x = params.x;
+        this.model.position.y = params.y;
         this.model.width = this.size;
         this.model.height = this.size;
         this.model.size = this.size;
@@ -148,17 +162,35 @@ var Box = (function (_super) {
     }
     return Box;
 }(Block));
+var Sand = (function (_super) {
+    __extends(Sand, _super);
+    function Sand(params) {
+        _super.call(this, {
+            blocked: false,
+            destroy: false
+        });
+        this.texture = PIXI.Texture.fromImage('../img/sand.png');
+        this.model = new PIXI.Sprite(this.texture);
+        this.model._a_name = 'sand';
+        this.model.position.x = params.x;
+        this.model.position.y = params.y;
+        this.model.width = this.size;
+        this.model.height = this.size;
+        this.model.size = this.size;
+        this.model.blocked = this.blocked;
+        this.model.destroy = this.destroy;
+    }
+    return Sand;
+}(Block));
 // DO NOT TOUCH. Not for dynamic generation; initialized in the code -->
-var wallTexture = PIXI.Texture.fromImage('../img/wall.png');
-var exampleWall = new Wall(wallTexture, 0, 0);
-var boxTexture = PIXI.Texture.fromImage('../img/box.png');
-var exampleBox = new Box(wallTexture, 0, 0);
-var bombTexture = PIXI.Texture.fromImage('../img/bomb.png');
-var exampleBomb = new Bomb(bombTexture, 0, 0, 1);
 var exampleBlock = new Block({
     blocked: false,
     destroy: false
 });
+var exampleWall = new Wall({ x: 0, y: 0 });
+var exampleBox = new Box({ x: 0, y: 0 });
+var exampleBomb = new Bomb({ x: 0, y: 0, waveLevel: 1 });
+var exampleSand = new Sand({ x: 0, y: 0 });
 // <-- end // 
 //=== DEPENDING ON ===//
 /// <reference path="../typings/jquery/jquery.d.ts"/>
@@ -173,12 +205,13 @@ var exampleBlock = new Block({
 /// <reference path="gameplay_classes/Bomb.ts"/>
 /// <reference path="gameplay_classes/Wall.ts"/>
 /// <reference path="gameplay_classes/Box.ts"/>
+/// <reference path="gameplay_classes/landscape/Sand.ts"/>
 //=== CODE ===//
 /// <reference path="example_blocks.ts"/>
 var GAME = new Game;
 var WORLD_MAP = new WorldMap;
-var playerTexture = PIXI.Texture.fromImage('../img/eshtu.png');
-var player_1 = new Player(playerTexture, 80, 60);
+var player_1 = new Player({ x: 0, y: 0 });
+var player_2 = new Player({ x: 240, y: 240 }, PIXI.Texture.fromImage('../img/player_2.png'));
 /// <reference path="map.ts"/>
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
@@ -188,8 +221,8 @@ function animate() {
     requestAnimationFrame(animate);
     renderer.render(WORLD_MAP.map);
 }
+/// <reference path="socket/socket.ts"/>
 /// <reference path="hotkeys.ts"/>
-/// <reference path="socket.ts"/>
 // UI
 /// <reference path="ui.ts"/> 
 var Controls = (function () {
@@ -232,7 +265,48 @@ var Controls = (function () {
     }
     return Controls;
 }());
+/// <reference path="../app.ts"/>
+var socket = io('', {
+    'reconnectionDelay': 1,
+    'reconnectionAttempts': 2
+});
+var ul = $('#chat ul');
+var form = $('#chat form');
+form.on('submit', function (e) { e.preventDefault(); });
+socket
+    .on('chat message', function (msg) {
+    ul.append('<li>' + msg + '</li>');
+})
+    .on('connect', function () {
+    ul.append('<li class="sys-msg">Соединение установлено</li>');
+    ;
+    form.on('submit', sendMessage);
+    socket.emit('player moving', player_1.model.position);
+    socket
+        .on('player coords', function (player_coords) {
+        player_1.model.position.x = player_coords.x;
+        player_1.model.position.y = player_coords.y;
+    });
+    socket.emit('user cookie', document.cookie);
+    console.log(document.cookie);
+})
+    .on('disconnect', function () {
+    ul.append('<li class="sys-msg">Соединение потеряно</li>');
+    ;
+    form.on('submit', function (e) { e.preventDefault(); });
+})
+    .on('reconnect_failed', function () {
+    ul.append('<li class="sys-msg">Соединение закрыто</li>');
+    ;
+});
+function sendMessage() {
+    socket.emit('chat message', $('#user-message').val());
+    $('#user-message').val('');
+    return false;
+}
+;
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 function keyArrowDown() {
     return {
         pressed: function () {
@@ -296,8 +370,9 @@ function keyArrowDown() {
                         player_1.camera.move(player_1.camera.y, 'y');
                     }
                 }
+                socket.emit('player moving', player_1.model.position);
             });
-        }
+        } /// End Pressed Function
     }; // End Return
 } // End Function
 /// <reference path="../hotkeys.ts"/>
@@ -365,6 +440,7 @@ function keyArrowUp() {
                     }
                 }
             });
+            socket.emit('player moving', player_1.model.position);
         }
     };
 }
@@ -432,6 +508,7 @@ function keyArrowRight() {
                         player_1.camera.move(player_1.camera.x, 'x');
                     }
                 }
+                socket.emit('player moving', player_1.model.position);
             });
         }
     };
@@ -500,6 +577,7 @@ function keyArrowLeft() {
                         player_1.camera.move(player_1.camera.x, 'x');
                     }
                 }
+                socket.emit('player moving', player_1.model.position);
             });
         }
     };
@@ -544,7 +622,7 @@ function keySpacebar() {
             }
             createArrays(function () {
                 if (WORLD_MAP.containers.bombs.children.length === 0) {
-                    bomb = new Bomb(bombTexture, player_1.model.position.x, player_1.model.position.y, 1);
+                    bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
                     WORLD_MAP.containers.bombs.addChild(bomb.model);
                     if (bomb) {
                         var _firstBomb_1 = bomb;
@@ -584,7 +662,7 @@ function keySpacebar() {
                     }
                 }
                 else if (player_1.model.position.x !== bomb.model.position.x || player_1.model.position.y !== bomb.model.position.y) {
-                    bomb = new Bomb(bombTexture, player_1.model.position.x, player_1.model.position.y, 1);
+                    bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
                     WORLD_MAP.containers.bombs.addChild(bomb.model);
                     if (bomb) {
                         var _otherBomb_1 = bomb;
@@ -742,59 +820,34 @@ $(document).on('keydown', function (e) {
 //   });
 // } 
 /// <reference path="app.ts"/>
-var wall_1 = new Wall(wallTexture, 80, 40);
-var wall_2 = new Wall(wallTexture, 160, 60);
-var wall_3 = new Wall(wallTexture, 100, 160);
-var box_1 = new Box(boxTexture, 100, 100);
-var box_2 = new Box(boxTexture, 160, 80);
-var box_3 = new Box(boxTexture, 140, 160);
-WORLD_MAP.map.addChild(WORLD_MAP.containers.players);
-WORLD_MAP.map.addChild(WORLD_MAP.containers.bombs);
-WORLD_MAP.map.addChild(WORLD_MAP.containers.walls);
-WORLD_MAP.map.addChild(WORLD_MAP.containers.boxes);
+var wall_1 = new Wall({ x: 80, y: 40 });
+var wall_2 = new Wall({ x: 160, y: 60 });
+var wall_3 = new Wall({ x: 100, y: 160 });
+var box_1 = new Box({ x: 100, y: 100 });
+var box_2 = new Box({ x: 160, y: 80 });
+var box_3 = new Box({ x: 140, y: 160 });
+var sand_1 = new Sand({ x: 0, y: 0 });
+var sand_2 = new Sand({ x: 0, y: 20 });
+var sand_3 = new Sand({ x: 20, y: 0 });
+var sand_4 = new Sand({ x: 20, y: 20 });
+for (var container in WORLD_MAP.containers) {
+    WORLD_MAP.map.addChild(WORLD_MAP.containers[container]);
+}
+for (var landscape in WORLD_MAP.landscape) {
+    WORLD_MAP.map.addChild(WORLD_MAP.landscape[landscape]);
+}
 WORLD_MAP.containers.players.addChild(player_1.model);
+WORLD_MAP.containers.players.addChild(player_2.model);
 WORLD_MAP.containers.walls.addChild(wall_1.model);
 WORLD_MAP.containers.walls.addChild(wall_2.model);
 WORLD_MAP.containers.walls.addChild(wall_3.model);
 WORLD_MAP.containers.boxes.addChild(box_1.model);
 WORLD_MAP.containers.boxes.addChild(box_2.model);
 WORLD_MAP.containers.boxes.addChild(box_3.model);
-/// <reference path="app.ts"/>
-var socket = io('', {
-    'reconnectionDelay': 1,
-    'reconnectionAttempts': 2
-});
-var ul = $('#chat ul');
-var form = $('#chat form');
-form.on('submit', function (e) { e.preventDefault(); });
-socket
-    .on('chat message', function (msg) {
-    ul.append('<li>' + msg + '</li>');
-})
-    .on('player moving', function (player_coords) {
-})
-    .on('connect', function () {
-    ul.append('<li class="sys-msg">Соединение установлено</li>');
-    ;
-    form.on('submit', sendMessage);
-    // socket.emit('player moving', function() {
-    // });
-})
-    .on('disconnect', function () {
-    ul.append('<li class="sys-msg">Соединение потеряно</li>');
-    ;
-    form.on('submit', function (e) { e.preventDefault(); });
-})
-    .on('reconnect_failed', function () {
-    ul.append('<li class="sys-msg">Соединение закрыто</li>');
-    ;
-});
-function sendMessage() {
-    socket.emit('chat message', $('#user-message').val());
-    $('#user-message').val('');
-    return false;
-}
-;
+// WORLD_MAP.landscape.sand.addChild(sand_1.model);
+// WORLD_MAP.landscape.sand.addChild(sand_2.model);
+// WORLD_MAP.landscape.sand.addChild(sand_3.model);
+// WORLD_MAP.landscape.sand.addChild(sand_4.model); 
 /// <reference path="app.ts"/>
 // One Page App
 var ui;
