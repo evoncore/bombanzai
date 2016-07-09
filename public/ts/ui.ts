@@ -38,9 +38,11 @@ module ui {
         $('#chat').stop().animate({
           height: $('body').innerHeight()
         }, 300);
+        $('#info').css({ overflowY: 'auto' });
       } else {
         $('#chat').stop().animate({
-          height: $('#game #game-display').innerHeight()
+          height: $('body').innerHeight() - $('#bar').innerHeight() + 'px',
+          overflowY: 'none'
         }, 300);
         $('#bar').stop().animate({bottom: 0}, 300);
       }
@@ -85,7 +87,7 @@ module ui {
   // Chat
 
   $('#chat').css({
-    height: $('#game #game-display').innerHeight()
+    height: $('body').innerHeight() - $('#bar').innerHeight() + 'px' 
   });
 
 

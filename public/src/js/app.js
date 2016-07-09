@@ -3,14 +3,79 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+/// <reference path="../app.ts"/>
+var socket = io('', {
+    'reconnectionDelay': 1,
+    'reconnectionAttempts': 60
+});
+var ul = $('#chat ul');
+var form = $('#chat form');
+form.on('submit', function (e) { e.preventDefault(); });
+socket
+    .on('chat message', function (msg) {
+    ul.append('<li>' + msg + '</li>');
+})
+    .on('connect', function () {
+    ul.append('<li class="sys-msg">Соединение установлено</li>');
+    ;
+    form.on('submit', sendMessage);
+    socket.on('player id', function (id) {
+        var num = id;
+        if (id > 3) {
+            id = 0;
+        }
+        if (id == 1) {
+            player_1.model.control = true;
+        }
+        if (id == 2) {
+            player_2.model.control = true;
+        }
+        if (id == 3) {
+            player_3.model.control = true;
+        }
+    });
+    socket.emit('player_1 moving', player_1.model.position);
+    socket
+        .on('player_1 coords', function (player_coords) {
+        player_1.model.position.x = player_coords.x;
+        player_1.model.position.y = player_coords.y;
+    });
+    socket.emit('player_2 moving', player_2.model.position);
+    socket
+        .on('player_2 coords', function (player_coords) {
+        player_2.model.position.x = player_coords.x;
+        player_2.model.position.y = player_coords.y;
+    });
+    socket.emit('player_3 moving', player_3.model.position);
+    socket
+        .on('player_3 coords', function (player_coords) {
+        player_3.model.position.x = player_coords.x;
+        player_3.model.position.y = player_coords.y;
+    });
+})
+    .on('disconnect', function () {
+    ul.append('<li class="sys-msg">Соединение потеряно</li>');
+    ;
+    form.on('submit', function (e) { e.preventDefault(); });
+})
+    .on('reconnect_failed', function () {
+    ul.append('<li class="sys-msg">Соединение закрыто</li>');
+    ;
+});
+function sendMessage() {
+    socket.emit('chat message', $('#user-message').val());
+    $('#user-message').val('');
+    return false;
+}
+;
 function slicePixels(obj) {
     return Number(obj.length == 5 ? obj.slice(0, 3) : obj.slice(0, 2));
 }
 var Game = (function () {
     function Game() {
         this.Display = {
-            width: 260,
-            height: 260,
+            width: 300,
+            height: 300,
             scroll: false
         };
     }
@@ -65,8 +130,8 @@ var Player = (function (_super) {
             Right: true
         };
         this.camera = {
-            x: -480,
-            y: -280,
+            x: -340,
+            y: -180,
             move: function (coord, vector) {
                 if (vector == 'y') {
                     $('canvas').css({ marginTop: -coord + 'px' });
@@ -79,6 +144,7 @@ var Player = (function (_super) {
         this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'player';
+        this.model.control = false;
         this.model.position.x = params.x;
         this.model.position.y = params.y;
         this.model.width = this.size;
@@ -87,8 +153,10 @@ var Player = (function (_super) {
         this.model.blocked = this.blocked;
         this.model.destroy = this.destroy;
         this.speed = this.size;
+        this.model.speed = this.speed;
         this.coords.x = params.x;
         this.coords.y = params.y;
+        this.model.canMove = this.canMove;
     }
     ;
     return Player;
@@ -169,7 +237,7 @@ var Sand = (function (_super) {
             blocked: false,
             destroy: false
         });
-        this.texture = PIXI.Texture.fromImage('../img/sand.png');
+        this.texture = PIXI.Texture.fromImage('../img/sand.svg');
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'sand';
         this.model.position.x = params.x;
@@ -197,6 +265,7 @@ var exampleSand = new Sand({ x: 0, y: 0 });
 /// <reference path="../typings/pixi.js/pixi.js.d.ts"/>
 /// <reference path="../typings/socket.io-client/socket.io-client.d.ts"/>
 //=== IMPORT FILES ===//
+/// <reference path="socket/socket.ts"/>
 /// <reference path="functions.ts"/>
 /// <reference path="classes/Game.ts"/>
 /// <reference path="classes/WorldMap.ts"/>
@@ -211,7 +280,26 @@ var exampleSand = new Sand({ x: 0, y: 0 });
 var GAME = new Game;
 var WORLD_MAP = new WorldMap;
 var player_1 = new Player({ x: 0, y: 0 });
-var player_2 = new Player({ x: 240, y: 240 }, PIXI.Texture.fromImage('../img/player_2.png'));
+var player_2 = new Player({ x: 280, y: 280 }, PIXI.Texture.fromImage('../img/player_2.png'));
+var player_3 = new Player({ x: 0, y: 280 }, PIXI.Texture.fromImage('../img/player_3.png'));
+socket.on('player id', function (id) {
+    var num = id;
+    if (id > 3) {
+        id = 0;
+    }
+    if (id == 1) {
+        player_1.model.control = true;
+    }
+    if (id == 2) {
+        player_2.model.control = true;
+    }
+    if (id == 3) {
+        player_3.model.control = true;
+    }
+    console.log(player_1.model.control);
+    console.log(player_2.model.control);
+    console.log(player_3.model.control);
+});
 /// <reference path="map.ts"/>
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
@@ -221,7 +309,6 @@ function animate() {
     requestAnimationFrame(animate);
     renderer.render(WORLD_MAP.map);
 }
-/// <reference path="socket/socket.ts"/>
 /// <reference path="hotkeys.ts"/>
 // UI
 /// <reference path="ui.ts"/> 
@@ -265,46 +352,6 @@ var Controls = (function () {
     }
     return Controls;
 }());
-/// <reference path="../app.ts"/>
-var socket = io('', {
-    'reconnectionDelay': 1,
-    'reconnectionAttempts': 2
-});
-var ul = $('#chat ul');
-var form = $('#chat form');
-form.on('submit', function (e) { e.preventDefault(); });
-socket
-    .on('chat message', function (msg) {
-    ul.append('<li>' + msg + '</li>');
-})
-    .on('connect', function () {
-    ul.append('<li class="sys-msg">Соединение установлено</li>');
-    ;
-    form.on('submit', sendMessage);
-    socket.emit('player moving', player_1.model.position);
-    socket
-        .on('player coords', function (player_coords) {
-        player_1.model.position.x = player_coords.x;
-        player_1.model.position.y = player_coords.y;
-    });
-    socket.emit('user cookie', document.cookie);
-    console.log(document.cookie);
-})
-    .on('disconnect', function () {
-    ul.append('<li class="sys-msg">Соединение потеряно</li>');
-    ;
-    form.on('submit', function (e) { e.preventDefault(); });
-})
-    .on('reconnect_failed', function () {
-    ul.append('<li class="sys-msg">Соединение закрыто</li>');
-    ;
-});
-function sendMessage() {
-    socket.emit('chat message', $('#user-message').val());
-    $('#user-message').val('');
-    return false;
-}
-;
 /// <reference path="../hotkeys.ts"/>
 /// <reference path="../socket/socket.ts"/>
 function keyArrowDown() {
@@ -312,7 +359,7 @@ function keyArrowDown() {
         pressed: function () {
             var objects = [];
             var blocked_objects = [];
-            player_1.canMove.Down = true;
+            var players = [];
             function createArrays(callback) {
                 // Add Objects
                 for (var key in WORLD_MAP.containers) {
@@ -328,6 +375,10 @@ function keyArrowDown() {
                         }
                     }
                 }
+                // Add Players
+                for (var player_ in WORLD_MAP.containers.players.children) {
+                    players.push(WORLD_MAP.containers.players.children[player_]);
+                }
                 // Add Blocked Objects without player
                 for (var key in WORLD_MAP.containers) {
                     var push = false;
@@ -345,43 +396,53 @@ function keyArrowDown() {
                 callback();
             }
             createArrays(function () {
+                for (var o = 0; o < players.length; o++) {
+                    players[o].canMove.Down = true;
+                }
                 for (var j = 0; j < blocked_objects.length; j++) {
                     if (blocked_objects[j].blocked) {
                         for (var i = 0; i < objects.length; i++) {
-                            if (!(player_1.model.position.x != objects[i].position.x ||
-                                player_1.model.position.y != (objects[i].position.y - blocked_objects[j].size))) {
-                                player_1.canMove.Down = false;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != objects[i].position.x ||
+                                    players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
+                                    players[o].canMove.Down = false;
+                                }
                             }
                         }
                     }
                     else {
                         for (var i = 0; i < objects[j].children.length; i++) {
-                            if (!(player_1.model.position.x != objects[i].position.x ||
-                                player_1.model.position.y != (objects[i].position.y - blocked_objects[j].size))) {
-                                player_1.canMove.Down = true;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != objects[i].position.x ||
+                                    players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
+                                    players[o].canMove.Down = true;
+                                }
                             }
                         }
                     }
                 } // End main For
-                if (player_1.canMove.Down && player_1.model.position.y < (GAME.Display.height - player_1.size)) {
-                    player_1.model.position.y += 1 * player_1.speed;
-                    if (GAME.Display.scroll) {
-                        player_1.camera.y += 1 * player_1.speed;
-                        player_1.camera.move(player_1.camera.y, 'y');
+                for (var o = 0; o < players.length; o++) {
+                    if (players[o].control && players[o].canMove.Down && players[o].position.y < (GAME.Display.height - players[o].size)) {
+                        players[o].position.y += 1 * players[o].speed;
+                        if (GAME.Display.scroll) {
+                            players[o].camera.y += 1 * players[o].speed;
+                            players[o].camera.move(players[o].camera.y, 'y');
+                        }
                     }
+                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                 }
-                socket.emit('player moving', player_1.model.position);
-            });
-        } /// End Pressed Function
+            }); // End createArrays Function
+        } // End Pressed Function
     }; // End Return
 } // End Function
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 function keyArrowUp() {
     return {
         pressed: function () {
             var objects = [];
             var blocked_objects = [];
-            player_1.canMove.Up = true;
+            var players = [];
             function createArrays(callback) {
                 // Add Objects
                 for (var key in WORLD_MAP.containers) {
@@ -392,10 +453,14 @@ function keyArrowUp() {
                         }
                     }
                     for (var key3 in WORLD_MAP.containers[key].children) {
-                        if (push && WORLD_MAP.containers[key].children[key3] != 0) {
+                        if (push && WORLD_MAP.containers[key].children[key3] !== 0) {
                             objects.push(WORLD_MAP.containers[key].children[key3]);
                         }
                     }
+                }
+                // Add Players
+                for (var player_ in WORLD_MAP.containers.players.children) {
+                    players.push(WORLD_MAP.containers.players.children[player_]);
                 }
                 // Add Blocked Objects without player
                 for (var key in WORLD_MAP.containers) {
@@ -414,43 +479,53 @@ function keyArrowUp() {
                 callback();
             }
             createArrays(function () {
+                for (var o = 0; o < players.length; o++) {
+                    players[o].canMove.Up = true;
+                }
                 for (var j = 0; j < blocked_objects.length; j++) {
                     if (blocked_objects[j].blocked) {
                         for (var i = 0; i < objects.length; i++) {
-                            if (!(player_1.model.position.x != objects[i].position.x ||
-                                player_1.model.position.y != (objects[i].position.y + blocked_objects[j].size))) {
-                                player_1.canMove.Up = false;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != objects[i].position.x ||
+                                    players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
+                                    players[o].canMove.Up = false;
+                                }
                             }
                         }
                     }
                     else {
                         for (var i = 0; i < objects[j].children.length; i++) {
-                            if (!(player_1.model.position.x != objects[i].position.x ||
-                                player_1.model.position.y != (objects[i].position.y + blocked_objects[j].size))) {
-                                player_1.canMove.Up = true;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != objects[i].position.x ||
+                                    players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
+                                    players[o].canMove.Up = true;
+                                }
                             }
                         }
                     }
                 } // End main For
-                if (player_1.canMove.Up && player_1.model.position.y > 0) {
-                    player_1.model.position.y -= 1 * player_1.speed;
-                    if (GAME.Display.scroll) {
-                        player_1.camera.y -= 1 * player_1.speed;
-                        player_1.camera.move(player_1.camera.y, 'y');
+                for (var o = 0; o < players.length; o++) {
+                    if (players[o].control && players[o].canMove.Up && players[o].position.y > 0) {
+                        players[o].position.y -= 1 * players[o].speed;
+                        if (GAME.Display.scroll) {
+                            players[o].camera.y -= 1 * players[o].speed;
+                            players[o].camera.move(players[o].camera.y, 'y');
+                        }
                     }
+                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                 }
-            });
-            socket.emit('player moving', player_1.model.position);
-        }
-    };
-}
+            }); // End createArrays Function
+        } // End Pressed Function
+    }; // End Return
+} // End Function
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 function keyArrowRight() {
     return {
         pressed: function () {
             var objects = [];
             var blocked_objects = [];
-            player_1.canMove.Right = true;
+            var players = [];
             function createArrays(callback) {
                 // Add Objects
                 for (var key in WORLD_MAP.containers) {
@@ -461,10 +536,14 @@ function keyArrowRight() {
                         }
                     }
                     for (var key3 in WORLD_MAP.containers[key].children) {
-                        if (push && WORLD_MAP.containers[key].children[key3] != 0) {
+                        if (push && WORLD_MAP.containers[key].children[key3] !== 0) {
                             objects.push(WORLD_MAP.containers[key].children[key3]);
                         }
                     }
+                }
+                // Add Players
+                for (var player_ in WORLD_MAP.containers.players.children) {
+                    players.push(WORLD_MAP.containers.players.children[player_]);
                 }
                 // Add Blocked Objects without player
                 for (var key in WORLD_MAP.containers) {
@@ -483,43 +562,53 @@ function keyArrowRight() {
                 callback();
             }
             createArrays(function () {
+                for (var o = 0; o < players.length; o++) {
+                    players[o].canMove.Right = true;
+                }
                 for (var j = 0; j < blocked_objects.length; j++) {
                     if (blocked_objects[j].blocked) {
                         for (var i = 0; i < objects.length; i++) {
-                            if (!(player_1.model.position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                                player_1.model.position.y != objects[i].position.y)) {
-                                player_1.canMove.Right = false;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
+                                    players[o].position.y != objects[i].position.y)) {
+                                    players[o].canMove.Right = false;
+                                }
                             }
                         }
                     }
                     else {
                         for (var i = 0; i < objects[j].children.length; i++) {
-                            if (!(player_1.model.position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                                player_1.model.position.y != objects[i].position.y)) {
-                                player_1.canMove.Right = true;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
+                                    players[o].position.y != objects[i].position.y)) {
+                                    players[o].canMove.Right = true;
+                                }
                             }
                         }
                     }
                 } // End main For
-                if (player_1.canMove.Right && player_1.model.position.x < (GAME.Display.height - player_1.size)) {
-                    player_1.model.position.x += 1 * player_1.speed;
-                    if (GAME.Display.scroll) {
-                        player_1.camera.x += 1 * player_1.speed;
-                        player_1.camera.move(player_1.camera.x, 'x');
+                for (var o = 0; o < players.length; o++) {
+                    if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
+                        players[o].position.x += 1 * players[o].speed;
+                        if (GAME.Display.scroll) {
+                            players[o].camera.x += 1 * players[o].speed;
+                            players[o].camera.move(players[o].camera.x, 'x');
+                        }
                     }
+                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                 }
-                socket.emit('player moving', player_1.model.position);
-            });
-        }
-    };
-}
+            }); // End createArrays Function
+        } // End Pressed Function
+    }; // End Return
+} // End Function
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 function keyArrowLeft() {
     return {
         pressed: function () {
             var objects = [];
             var blocked_objects = [];
-            player_1.canMove.Left = true;
+            var players = [];
             function createArrays(callback) {
                 // Add Objects
                 for (var key in WORLD_MAP.containers) {
@@ -530,10 +619,14 @@ function keyArrowLeft() {
                         }
                     }
                     for (var key3 in WORLD_MAP.containers[key].children) {
-                        if (push && WORLD_MAP.containers[key].children[key3] != 0) {
+                        if (push && WORLD_MAP.containers[key].children[key3] !== 0) {
                             objects.push(WORLD_MAP.containers[key].children[key3]);
                         }
                     }
+                }
+                // Add Players
+                for (var player_ in WORLD_MAP.containers.players.children) {
+                    players.push(WORLD_MAP.containers.players.children[player_]);
                 }
                 // Add Blocked Objects without player
                 for (var key in WORLD_MAP.containers) {
@@ -552,40 +645,49 @@ function keyArrowLeft() {
                 callback();
             }
             createArrays(function () {
+                for (var o = 0; o < players.length; o++) {
+                    players[o].canMove.Left = true;
+                }
                 for (var j = 0; j < blocked_objects.length; j++) {
                     if (blocked_objects[j].blocked) {
                         for (var i = 0; i < objects.length; i++) {
-                            if (!(player_1.model.position.x != (objects[i].position.x + blocked_objects[j].size) ||
-                                player_1.model.position.y != objects[i].position.y)) {
-                                player_1.canMove.Left = false;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
+                                    players[o].position.y != objects[i].position.y)) {
+                                    players[o].canMove.Left = false;
+                                }
                             }
                         }
                     }
                     else {
                         for (var i = 0; i < objects[j].children.length; i++) {
-                            if (!(player_1.model.position.x != (objects[i].position.x + blocked_objects[j].size) ||
-                                player_1.model.position.y != objects[i].position.y)) {
-                                player_1.canMove.Left = true;
+                            for (var o = 0; o < players.length; o++) {
+                                if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
+                                    players[o].position.y != objects[i].position.y)) {
+                                    players[o].canMove.Left = true;
+                                }
                             }
                         }
                     }
                 } // End main For
-                if (player_1.canMove.Left && player_1.model.position.x > 0) {
-                    player_1.model.position.x -= 1 * player_1.speed;
-                    if (GAME.Display.scroll) {
-                        player_1.camera.x -= 1 * player_1.speed;
-                        player_1.camera.move(player_1.camera.x, 'x');
+                for (var o = 0; o < players.length; o++) {
+                    if (players[o].control && players[o].canMove.Left && players[o].position.x > 0) {
+                        players[o].position.x -= 1 * players[o].speed;
+                        if (GAME.Display.scroll) {
+                            players[o].camera.x -= 1 * players[o].speed;
+                            players[o].camera.move(players[o].camera.x, 'x');
+                        }
                     }
+                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                 }
-                socket.emit('player moving', player_1.model.position);
-            });
-        }
-    };
-}
+            }); // End createArrays Function
+        } // End Pressed Function
+    }; // End Return
+} // End Function
 /// <reference path="../hotkeys.ts"/>
 function keySpacebar() {
     function checkPlayer() {
-        if (WORLD_MAP.containers.players.children.length === 0) {
+        if (WORLD_MAP.containers.players.children.length === 1) {
             player_1.alive = false;
         }
     }
@@ -658,7 +760,7 @@ function keySpacebar() {
                                 checkPlayer();
                                 playerPlayerAlive();
                             }
-                        }, 2000);
+                        }, 1000);
                     }
                 }
                 else if (player_1.model.position.x !== bomb.model.position.x || player_1.model.position.y !== bomb.model.position.y) {
@@ -698,7 +800,7 @@ function keySpacebar() {
                                 checkPlayer();
                                 playerPlayerAlive();
                             }
-                        }, 2000);
+                        }, 1000);
                     }
                 }
             });
@@ -826,10 +928,10 @@ var wall_3 = new Wall({ x: 100, y: 160 });
 var box_1 = new Box({ x: 100, y: 100 });
 var box_2 = new Box({ x: 160, y: 80 });
 var box_3 = new Box({ x: 140, y: 160 });
-var sand_1 = new Sand({ x: 0, y: 0 });
-var sand_2 = new Sand({ x: 0, y: 20 });
-var sand_3 = new Sand({ x: 20, y: 0 });
-var sand_4 = new Sand({ x: 20, y: 20 });
+var sand_1 = new Sand({ x: 0, y: 120 });
+var sand_2 = new Sand({ x: 0, y: 140 });
+var sand_3 = new Sand({ x: 20, y: 120 });
+var sand_4 = new Sand({ x: 20, y: 140 });
 for (var container in WORLD_MAP.containers) {
     WORLD_MAP.map.addChild(WORLD_MAP.containers[container]);
 }
@@ -838,16 +940,14 @@ for (var landscape in WORLD_MAP.landscape) {
 }
 WORLD_MAP.containers.players.addChild(player_1.model);
 WORLD_MAP.containers.players.addChild(player_2.model);
+WORLD_MAP.containers.players.addChild(player_3.model);
 WORLD_MAP.containers.walls.addChild(wall_1.model);
 WORLD_MAP.containers.walls.addChild(wall_2.model);
 WORLD_MAP.containers.walls.addChild(wall_3.model);
 WORLD_MAP.containers.boxes.addChild(box_1.model);
 WORLD_MAP.containers.boxes.addChild(box_2.model);
 WORLD_MAP.containers.boxes.addChild(box_3.model);
-// WORLD_MAP.landscape.sand.addChild(sand_1.model);
-// WORLD_MAP.landscape.sand.addChild(sand_2.model);
-// WORLD_MAP.landscape.sand.addChild(sand_3.model);
-// WORLD_MAP.landscape.sand.addChild(sand_4.model); 
+// WORLD_MAP.landscape.sand.addChild(sand_1.model); 
 /// <reference path="app.ts"/>
 // One Page App
 var ui;
@@ -878,10 +978,12 @@ var ui;
                 $('#chat').stop().animate({
                     height: $('body').innerHeight()
                 }, 300);
+                $('#info').css({ overflowY: 'auto' });
             }
             else {
                 $('#chat').stop().animate({
-                    height: $('#game #game-display').innerHeight()
+                    height: $('body').innerHeight() - $('#bar').innerHeight() + 'px',
+                    overflowY: 'none'
                 }, 300);
                 $('#bar').stop().animate({ bottom: 0 }, 300);
             }
@@ -908,7 +1010,7 @@ var ui;
     $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });
     // Chat
     $('#chat').css({
-        height: $('#game #game-display').innerHeight()
+        height: $('body').innerHeight() - $('#bar').innerHeight() + 'px'
     });
     // Errors
     if ($(window).innerWidth() <= 1199) {

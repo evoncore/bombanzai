@@ -10,7 +10,7 @@ class Player extends Block
   coords = {
     x: null,
     y: null
-  }
+  };
 
   constructor(params, texture = PIXI.Texture.fromImage('../img/player_1.png')) {
     super({
@@ -20,7 +20,8 @@ class Player extends Block
 
     this.texture = texture;
     this.model = new PIXI.Sprite(this.texture);
-    this.model._a_name = 'player'; 
+    this.model._a_name = 'player';
+    this.model.control = false;
 
     this.model.position.x = params.x;
     this.model.position.y = params.y;
@@ -33,9 +34,12 @@ class Player extends Block
     this.model.destroy = this.destroy;
 
     this.speed = this.size;
+    this.model.speed = this.speed;
 
     this.coords.x = params.x;
     this.coords.y = params.y;
+    
+    this.model.canMove = this.canMove;
   };
 
   canMove = {
@@ -46,8 +50,8 @@ class Player extends Block
   };
 
   camera = {
-    x: -480,
-    y: -280,
+    x: -340, // 480
+    y: -180, // 280
     move: function(coord, vector) {
       if (vector == 'y') {
         $('canvas').css({ marginTop: -coord + 'px' });

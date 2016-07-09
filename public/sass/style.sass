@@ -76,7 +76,6 @@ section
   padding: 20px 60px
   padding-bottom: 0
   height: 100%
-  overflow-y: auto
   max-width: 100%
   hr
     display: block
@@ -156,7 +155,6 @@ section
 
 #game
   padding: 0
-  overflow: hidden
 
 nav
   cursor: default
@@ -205,10 +203,9 @@ p
     transform: rotate(-90deg)
     position: absolute
     right: -37px
-    top: 8%
+    top: 10%
     font: 700 2.5em $sf, $af
     color: #fff
-    opacity: 0
     &:first-letter
       color: $mc
     i
@@ -227,7 +224,6 @@ aside
   width: 100%
   box-sizing: border-box
   border-right: 3px solid $mc
-  opacity: 0
   .fa
     font-size: 24px
   nav
@@ -298,6 +294,23 @@ canvas
   outline: 1px solid #fff
 
 
+// top-bar
+
+#top-bar
+  padding: 10px 45px
+  font-size: 1.5em
+  text-align: center
+  span
+    display: inline-block
+    font-family: $ap, $af
+    margin: 0 20px
+    b
+      font-weight: 400
+      display: inline-block
+      color: $mc
+      margin-left: 10px
+
+
 // bar
 
 #bar
@@ -309,7 +322,6 @@ canvas
   padding: 20px
   bottom: 0
   height: 70px
-  opacity: 0
   span
     display: inline-block
     margin: 0 15px
@@ -321,7 +333,6 @@ canvas
   background-color: #111
   width: 100%
   border-left: 3px solid $mc
-  opacity: 0
   h1
     text-align: center
     padding-bottom: 15px

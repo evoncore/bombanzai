@@ -1,4 +1,5 @@
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/socket.ts"/>
 
 function keyArrowRight() {
 
@@ -8,8 +9,7 @@ function keyArrowRight() {
 
       var objects = [];
       var blocked_objects = [];
-
-      player_1.canMove.Right = true;
+      var players = [];
 
       function createArrays(callback) {
 
@@ -24,10 +24,15 @@ function keyArrowRight() {
           }
 
           for (let key3 in WORLD_MAP.containers[key].children) {
-            if (push && WORLD_MAP.containers[key].children[key3] != 0) {
+            if (push && WORLD_MAP.containers[key].children[key3] !== 0) {
               objects.push(WORLD_MAP.containers[key].children[key3]);
             }
           }
+        }
+
+        // Add Players
+        for (let player_ in WORLD_MAP.containers.players.children) {
+          players.push(WORLD_MAP.containers.players.children[player_]);
         }
 
         // Add Blocked Objects without player
@@ -52,42 +57,52 @@ function keyArrowRight() {
 
       createArrays(function() {
 
+        for (var o = 0; o < players.length; o++) {
+          players[o].canMove.Right = true;
+        }
+
         for (var j = 0; j < blocked_objects.length; j++) {
 
           if (blocked_objects[j].blocked) {
             for (var i = 0; i < objects.length; i++) {
-              if (!(player_1.model.position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                    player_1.model.position.y != objects[i].position.y))
-              {
-                player_1.canMove.Right = false;
+              for (var o = 0; o < players.length; o++) {
+                if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
+                      players[o].position.y != objects[i].position.y))
+                {
+                  players[o].canMove.Right = false;
+                }
               }
             }
           } else {
             for (var i = 0; i < objects[j].children.length; i++) {
-              if (!(player_1.model.position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                    player_1.model.position.y != objects[i].position.y))
-              {
-
-                player_1.canMove.Right = true;
+              for (var o = 0; o < players.length; o++) {
+                if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
+                      players[o].position.y != objects[i].position.y))
+                {
+                  players[o].canMove.Right = true;
+                }
               }
             }
           }
 
         } // End main For
 
-        if (player_1.canMove.Right && player_1.model.position.x < (GAME.Display.height - player_1.size)) {
-          player_1.model.position.x += 1 * player_1.speed;
-          if (GAME.Display.scroll) {      
-            player_1.camera.x += 1 * player_1.speed;
-            player_1.camera.move(player_1.camera.x, 'x');
+        for (var o = 0; o < players.length; o++) {
+          if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
+            players[o].position.x += 1 * players[o].speed;
+            if (GAME.Display.scroll) {      
+              players[o].camera.x += 1 * players[o].speed;
+              players[o].camera.move(players[o].camera.x, 'x');
+            }
           }
-        }
 
-        socket.emit('player moving', player_1.model.position);
+          socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+        }    
 
-      });
-    }
+      }); // End createArrays Function
 
-  }
+    } // End Pressed Function
 
-}
+  } // End Return
+
+} // End Function

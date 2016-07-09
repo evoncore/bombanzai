@@ -3,7 +3,7 @@
 function keySpacebar() {
 
   function checkPlayer() {
-    if (WORLD_MAP.containers.players.children.length === 0) {
+    if (WORLD_MAP.containers.players.children.length === 1) {
       player_1.alive = false;
     }
   }
@@ -95,7 +95,7 @@ function keySpacebar() {
                 playerPlayerAlive();
               }
              
-            }, 2000);
+            }, 1000);
           }
         }
 
@@ -142,7 +142,7 @@ function keySpacebar() {
                 playerPlayerAlive();
               }
              
-            }, 2000);
+            }, 1000);
           }
         }
 

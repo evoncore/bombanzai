@@ -6,6 +6,7 @@
 
 //=== IMPORT FILES ===//
 
+/// <reference path="socket/socket.ts"/>
 /// <reference path="functions.ts"/>
 /// <reference path="classes/Game.ts"/>
 /// <reference path="classes/WorldMap.ts"/>
@@ -25,7 +26,32 @@ const GAME = new Game;
 const WORLD_MAP = new WorldMap;
 
 var player_1 = new Player({ x: 0, y: 0 });
-var player_2 = new Player({ x: 240, y: 240 }, PIXI.Texture.fromImage('../img/player_2.png'));
+var player_2 = new Player({ x: 280, y: 280 }, PIXI.Texture.fromImage('../img/player_2.png'));
+var player_3 = new Player({ x: 0, y: 280 }, PIXI.Texture.fromImage('../img/player_3.png'));
+
+socket.on('player id', function(id) {
+  var num = id;
+
+  if (id > 3) {
+    id = 0;
+  }
+
+  if (id == 1) {
+    player_1.model.control = true;
+  }
+
+  if (id == 2) {
+    player_2.model.control = true;
+  }
+
+  if (id == 3) {
+    player_3.model.control = true;
+  }
+
+  console.log(player_1.model.control);
+  console.log(player_2.model.control);
+  console.log(player_3.model.control);
+});
 
 /// <reference path="map.ts"/>
 
@@ -38,9 +64,6 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(WORLD_MAP.map);
 }
-
-
-/// <reference path="socket/socket.ts"/>
 /// <reference path="hotkeys.ts"/>
 
 
