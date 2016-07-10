@@ -71,11 +71,11 @@ module ui {
 
   // Bar
 
-  $('#game').append('<div id="bar"></div>');
   var staticBombsCount = player_1.model.bombsCount;
 
-  $('#game #bar').append('<span class="hp">hp: <b>100 / 100</b></span>');
-  $('#game #bar').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
+  $('#game #bar .row').prepend('<div class="col-md-9"></div>')
+  $('#game #bar .col-md-9').append('<span class="hp">hp: <b>100 / 100</b></span>');
+  $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
 
 
   // Asides

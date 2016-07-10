@@ -55,6 +55,7 @@ socket.on('player id', function(id) {
 
 /// <reference path="map.ts"/>
 
+
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
 $('#game #game-display').append(renderer.view);
@@ -69,6 +70,27 @@ var destroyObjects = [];
 var objectContainers = [];
 var players = [];
 var staticBombsCount = player_1.model.bombsCount;
+
+// function checkPlayer() {
+//   for (var o = 0; o < players.length; o++) {
+//     if (WORLD_MAP.containers.players.children.length === 1) {
+//       players[o].alive = false;
+//       console.log(players[o]);
+//       console.log(players[o].alive);
+//     }
+//   }
+// }
+
+// function playerPlayerAlive() {
+//   for (var o = 0; o < players.length; o++) {
+//     if (!players[o].alive) {
+//       setTimeout(function() {
+//         alert('game over!');
+//         location.reload();
+//       }, 200);
+//     }
+//   }
+// }
 
 // Add Destroy Objects
 

@@ -80,7 +80,7 @@ socket
 });
 socket.on('pong', function (data) {
     var data = data;
-    if (data && typeof data != 'object') {
+    if (data && typeof data == 'number') {
         $('#ping span').text('ping: ' + data);
     }
 });
@@ -351,6 +351,25 @@ var destroyObjects = [];
 var objectContainers = [];
 var players = [];
 var staticBombsCount = player_1.model.bombsCount;
+// function checkPlayer() {
+//   for (var o = 0; o < players.length; o++) {
+//     if (WORLD_MAP.containers.players.children.length === 1) {
+//       players[o].alive = false;
+//       console.log(players[o]);
+//       console.log(players[o].alive);
+//     }
+//   }
+// }
+// function playerPlayerAlive() {
+//   for (var o = 0; o < players.length; o++) {
+//     if (!players[o].alive) {
+//       setTimeout(function() {
+//         alert('game over!');
+//         location.reload();
+//       }, 200);
+//     }
+//   }
+// }
 // Add Destroy Objects
 createMap(function () {
     for (var key in WORLD_MAP.containers) {
@@ -739,19 +758,6 @@ function keyArrowLeft() {
 } // End Function
 /// <reference path="../hotkeys.ts"/>
 function keySpacebar() {
-    function checkPlayer() {
-        if (WORLD_MAP.containers.players.children.length === 1) {
-            player_1.alive = false;
-        }
-    }
-    function playerPlayerAlive() {
-        if (!player_1.alive) {
-            setTimeout(function () {
-                alert('game over!');
-                location.reload();
-            }, 200);
-        }
-    }
     function showBombsValue(value, staticValue) {
         $('#bar span.bombs').text('bombs: ' + value + ' / ' + staticValue);
     }
@@ -786,19 +792,14 @@ function keySpacebar() {
                                                     // findArrayValue - global function from ./functions.ts
                                                     socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                                                 }
-                                                checkPlayer();
                                             }
                                             else {
                                                 WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
-                                                checkPlayer();
                                             }
                                         }
-                                        playerPlayerAlive();
                                     }
                                     else {
                                         objectContainers[i].removeChild(_firstBomb_1.model);
-                                        checkPlayer();
-                                        playerPlayerAlive();
                                     }
                                 }, 1000);
                             }
@@ -827,19 +828,14 @@ function keySpacebar() {
                                                     // findArrayValue - global function from ./functions.ts
                                                     socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                                                 }
-                                                checkPlayer();
                                             }
                                             else {
                                                 WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                                checkPlayer();
                                             }
                                         }
-                                        playerPlayerAlive();
                                     }
                                     else {
                                         WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                        checkPlayer();
-                                        playerPlayerAlive();
                                     }
                                 }, 1000);
                             }
@@ -1183,10 +1179,10 @@ var ui;
         $('#game #game-display  #grid').append('<i class="map-tile"></i>');
     }
     // Bar
-    $('#game').append('<div id="bar"></div>');
     var staticBombsCount = player_1.model.bombsCount;
-    $('#game #bar').append('<span class="hp">hp: <b>100 / 100</b></span>');
-    $('#game #bar').append('<span class="bombs">bombs: <b>' + staticBombsCount + ' / ' + staticBombsCount + '</b></span>');
+    $('#game #bar .row').prepend('<div class="col-md-9"></div>');
+    $('#game #bar .col-md-9').append('<span class="hp">hp: <b>100 / 100</b></span>');
+    $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>' + staticBombsCount + ' / ' + staticBombsCount + '</b></span>');
     // Asides
     $('body').css({ height: $(window).innerHeight() });
     $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });

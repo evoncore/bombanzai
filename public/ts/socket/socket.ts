@@ -86,7 +86,7 @@ socket
 
   socket.on('pong', function(data) {
     var data = data;
-    if (data && typeof data != 'object') {
+    if (data && typeof data == 'number') {
       $('#ping span').text('ping: ' + data);
     }
   });

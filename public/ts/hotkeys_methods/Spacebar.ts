@@ -2,21 +2,6 @@
 
 function keySpacebar() {
 
-  function checkPlayer() {
-    if (WORLD_MAP.containers.players.children.length === 1) {
-      player_1.alive = false;
-    }
-  }
-
-  function playerPlayerAlive() {  
-    if (!player_1.alive) {
-      setTimeout(function() {
-        alert('game over!');
-        location.reload();
-      }, 200);
-    }
-  }
-
   function showBombsValue(value, staticValue) {
     $('#bar span.bombs').text('bombs: ' + value + ' / ' + staticValue);
   }
@@ -63,18 +48,18 @@ function keySpacebar() {
                             // findArrayValue - global function from ./functions.ts
                             socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
-                          checkPlayer();
+                          
                         } else {
                           WORLD_MAP.containers.bombs.removeChild(_firstBomb.model);
-                          checkPlayer();
+                          
                         }
                       }
 
-                      playerPlayerAlive();
+                      
                     } else {
                       objectContainers[i].removeChild(_firstBomb.model);
-                      checkPlayer();
-                      playerPlayerAlive();
+                      
+                      
                     }
 
                   }, 1000);
@@ -111,17 +96,17 @@ function keySpacebar() {
                             // findArrayValue - global function from ./functions.ts
                             socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
-                          checkPlayer();
+                          
                         } else {
                           WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
-                          checkPlayer();
+                          
                         }
                       }
-                      playerPlayerAlive();
+                      
                     } else {
                       WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
-                      checkPlayer();
-                      playerPlayerAlive();
+                      
+                      
                     }
                    
                   }, 1000);
