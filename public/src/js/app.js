@@ -118,7 +118,6 @@ var Player = (function (_super) {
             destroy: true
         });
         this.alive = true;
-        this.bombsCount = 3;
         this.coords = {
             x: null,
             y: null
@@ -145,6 +144,7 @@ var Player = (function (_super) {
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'player';
         this.model.control = false;
+        this.model.bombsCount = 2;
         this.model.position.x = params.x;
         this.model.position.y = params.y;
         this.model.width = this.size;
@@ -255,6 +255,7 @@ var exampleBlock = new Block({
     blocked: false,
     destroy: false
 });
+var examplePlayer = new Sand({ x: 0, y: 0 });
 var exampleWall = new Wall({ x: 0, y: 0 });
 var exampleBox = new Box({ x: 0, y: 0 });
 var exampleBomb = new Bomb({ x: 0, y: 0, waveLevel: 1 });
@@ -296,9 +297,6 @@ socket.on('player id', function (id) {
     if (id == 3) {
         player_3.model.control = true;
     }
-    console.log(player_1.model.control);
-    console.log(player_2.model.control);
-    console.log(player_3.model.control);
 });
 /// <reference path="map.ts"/>
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
@@ -397,40 +395,36 @@ function keyArrowDown() {
             }
             createArrays(function () {
                 for (var o = 0; o < players.length; o++) {
-                    players[o].canMove.Down = true;
-                }
-                for (var j = 0; j < blocked_objects.length; j++) {
-                    if (blocked_objects[j].blocked) {
-                        for (var i = 0; i < objects.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != objects[i].position.x ||
-                                    players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
-                                    players[o].canMove.Down = false;
+                    if (players[o].control) {
+                        players[o].canMove.Down = true;
+                        for (var j = 0; j < blocked_objects.length; j++) {
+                            if (blocked_objects[j].blocked) {
+                                for (var i = 0; i < objects.length; i++) {
+                                    if (!(players[o].position.x != objects[i].position.x ||
+                                        players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
+                                        players[o].canMove.Down = false;
+                                    }
                                 }
                             }
-                        }
-                    }
-                    else {
-                        for (var i = 0; i < objects[j].children.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != objects[i].position.x ||
-                                    players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
-                                    players[o].canMove.Down = true;
+                            else {
+                                for (var i = 0; i < objects[j].children.length; i++) {
+                                    if (!(players[o].position.x != objects[i].position.x ||
+                                        players[o].position.y != (objects[i].position.y - blocked_objects[j].size))) {
+                                        players[o].canMove.Down = true;
+                                    }
                                 }
                             }
+                        } // End main For
+                        if (players[o].control && players[o].canMove.Down && players[o].position.y < (GAME.Display.height - players[o].size)) {
+                            players[o].position.y += 1 * players[o].speed;
+                            if (GAME.Display.scroll) {
+                                players[o].camera.y += 1 * players[o].speed;
+                                players[o].camera.move(players[o].camera.y, 'y');
+                            }
                         }
-                    }
-                } // End main For
-                for (var o = 0; o < players.length; o++) {
-                    if (players[o].control && players[o].canMove.Down && players[o].position.y < (GAME.Display.height - players[o].size)) {
-                        players[o].position.y += 1 * players[o].speed;
-                        if (GAME.Display.scroll) {
-                            players[o].camera.y += 1 * players[o].speed;
-                            players[o].camera.move(players[o].camera.y, 'y');
-                        }
-                    }
-                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
-                }
+                        socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+                    } // End if -> players.controls
+                } // End Players For
             }); // End createArrays Function
         } // End Pressed Function
     }; // End Return
@@ -480,40 +474,36 @@ function keyArrowUp() {
             }
             createArrays(function () {
                 for (var o = 0; o < players.length; o++) {
-                    players[o].canMove.Up = true;
-                }
-                for (var j = 0; j < blocked_objects.length; j++) {
-                    if (blocked_objects[j].blocked) {
-                        for (var i = 0; i < objects.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != objects[i].position.x ||
-                                    players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
-                                    players[o].canMove.Up = false;
+                    if (players[o].control) {
+                        players[o].canMove.Up = true;
+                        for (var j = 0; j < blocked_objects.length; j++) {
+                            if (blocked_objects[j].blocked) {
+                                for (var i = 0; i < objects.length; i++) {
+                                    if (!(players[o].position.x != objects[i].position.x ||
+                                        players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
+                                        players[o].canMove.Up = false;
+                                    }
                                 }
                             }
-                        }
-                    }
-                    else {
-                        for (var i = 0; i < objects[j].children.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != objects[i].position.x ||
-                                    players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
-                                    players[o].canMove.Up = true;
+                            else {
+                                for (var i = 0; i < objects[j].children.length; i++) {
+                                    if (!(players[o].position.x != objects[i].position.x ||
+                                        players[o].position.y != (objects[i].position.y + blocked_objects[j].size))) {
+                                        players[o].canMove.Up = true;
+                                    }
                                 }
                             }
+                        } // End main For
+                        if (players[o].control && players[o].canMove.Up && players[o].position.y > 0) {
+                            players[o].position.y -= 1 * players[o].speed;
+                            if (GAME.Display.scroll) {
+                                players[o].camera.y -= 1 * players[o].speed;
+                                players[o].camera.move(players[o].camera.y, 'y');
+                            }
                         }
-                    }
-                } // End main For
-                for (var o = 0; o < players.length; o++) {
-                    if (players[o].control && players[o].canMove.Up && players[o].position.y > 0) {
-                        players[o].position.y -= 1 * players[o].speed;
-                        if (GAME.Display.scroll) {
-                            players[o].camera.y -= 1 * players[o].speed;
-                            players[o].camera.move(players[o].camera.y, 'y');
-                        }
-                    }
-                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
-                }
+                        socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+                    } // End if -> players.controls
+                } // End Players For 
             }); // End createArrays Function
         } // End Pressed Function
     }; // End Return
@@ -563,40 +553,36 @@ function keyArrowRight() {
             }
             createArrays(function () {
                 for (var o = 0; o < players.length; o++) {
-                    players[o].canMove.Right = true;
-                }
-                for (var j = 0; j < blocked_objects.length; j++) {
-                    if (blocked_objects[j].blocked) {
-                        for (var i = 0; i < objects.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
-                                    players[o].position.y != objects[i].position.y)) {
-                                    players[o].canMove.Right = false;
+                    if (players[o].control) {
+                        players[o].canMove.Right = true;
+                        for (var j = 0; j < blocked_objects.length; j++) {
+                            if (blocked_objects[j].blocked) {
+                                for (var i = 0; i < objects.length; i++) {
+                                    if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
+                                        players[o].position.y != objects[i].position.y)) {
+                                        players[o].canMove.Right = false;
+                                    }
                                 }
                             }
-                        }
-                    }
-                    else {
-                        for (var i = 0; i < objects[j].children.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                                    players[o].position.y != objects[i].position.y)) {
-                                    players[o].canMove.Right = true;
+                            else {
+                                for (var i = 0; i < objects[j].children.length; i++) {
+                                    if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
+                                        players[o].position.y != objects[i].position.y)) {
+                                        players[o].canMove.Right = true;
+                                    }
                                 }
                             }
+                        } // End main For
+                        if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
+                            players[o].position.x += 1 * players[o].speed;
+                            if (GAME.Display.scroll) {
+                                players[o].camera.x += 1 * players[o].speed;
+                                players[o].camera.move(players[o].camera.x, 'x');
+                            }
                         }
-                    }
-                } // End main For
-                for (var o = 0; o < players.length; o++) {
-                    if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
-                        players[o].position.x += 1 * players[o].speed;
-                        if (GAME.Display.scroll) {
-                            players[o].camera.x += 1 * players[o].speed;
-                            players[o].camera.move(players[o].camera.x, 'x');
-                        }
-                    }
-                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
-                }
+                        socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+                    } // End if -> players.controls
+                } // End Players For 
             }); // End createArrays Function
         } // End Pressed Function
     }; // End Return
@@ -646,40 +632,36 @@ function keyArrowLeft() {
             }
             createArrays(function () {
                 for (var o = 0; o < players.length; o++) {
-                    players[o].canMove.Left = true;
-                }
-                for (var j = 0; j < blocked_objects.length; j++) {
-                    if (blocked_objects[j].blocked) {
-                        for (var i = 0; i < objects.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
-                                    players[o].position.y != objects[i].position.y)) {
-                                    players[o].canMove.Left = false;
+                    if (players[o].control) {
+                        players[o].canMove.Left = true;
+                        for (var j = 0; j < blocked_objects.length; j++) {
+                            if (blocked_objects[j].blocked) {
+                                for (var i = 0; i < objects.length; i++) {
+                                    if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
+                                        players[o].position.y != objects[i].position.y)) {
+                                        players[o].canMove.Left = false;
+                                    }
                                 }
                             }
-                        }
-                    }
-                    else {
-                        for (var i = 0; i < objects[j].children.length; i++) {
-                            for (var o = 0; o < players.length; o++) {
-                                if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
-                                    players[o].position.y != objects[i].position.y)) {
-                                    players[o].canMove.Left = true;
+                            else {
+                                for (var i = 0; i < objects[j].children.length; i++) {
+                                    if (!(players[o].position.x != (objects[i].position.x + blocked_objects[j].size) ||
+                                        players[o].position.y != objects[i].position.y)) {
+                                        players[o].canMove.Left = true;
+                                    }
                                 }
                             }
+                        } // End main For
+                        if (players[o].control && players[o].canMove.Left && players[o].position.x > 0) {
+                            players[o].position.x -= 1 * players[o].speed;
+                            if (GAME.Display.scroll) {
+                                players[o].camera.x -= 1 * players[o].speed;
+                                players[o].camera.move(players[o].camera.x, 'x');
+                            }
                         }
-                    }
-                } // End main For
-                for (var o = 0; o < players.length; o++) {
-                    if (players[o].control && players[o].canMove.Left && players[o].position.x > 0) {
-                        players[o].position.x -= 1 * players[o].speed;
-                        if (GAME.Display.scroll) {
-                            players[o].camera.x -= 1 * players[o].speed;
-                            players[o].camera.move(players[o].camera.x, 'x');
-                        }
-                    }
-                    socket.emit('player_' + (o + 1) + ' moving', players[o].position);
-                }
+                        socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+                    } // End if -> players.controls
+                } // End Players For
             }); // End createArrays Function
         } // End Pressed Function
     }; // End Return
@@ -699,10 +681,15 @@ function keySpacebar() {
             }, 200);
         }
     }
+    function showBombsValue(value, staticValue) {
+        $('#bar span.bombs').text('bombs: ' + value + ' / ' + staticValue);
+    }
     return {
         pressed: function () {
             var destroyObjects = [];
             var objectContainers = [];
+            var players = [];
+            var staticBombsCount = player_1.model.bombsCount;
             function createArrays(callback) {
                 for (var key in WORLD_MAP.containers) {
                     var push = false;
@@ -717,93 +704,111 @@ function keySpacebar() {
                         }
                     }
                 }
+                // Add Players
+                for (var player_ in WORLD_MAP.containers.players.children) {
+                    players.push(WORLD_MAP.containers.players.children[player_]);
+                }
                 for (var key4 in WORLD_MAP.containers) {
                     objectContainers.push(WORLD_MAP.containers[key4]);
                 }
                 callback();
             }
             createArrays(function () {
-                if (WORLD_MAP.containers.bombs.children.length === 0) {
-                    bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
-                    WORLD_MAP.containers.bombs.addChild(bomb.model);
-                    if (bomb) {
-                        var _firstBomb_1 = bomb;
-                        setTimeout(function () {
-                            if (destroyObjects.length !== 0) {
-                                for (var i = 0; i < destroyObjects.length; i++) {
-                                    if (_firstBomb_1.model.position.y === (destroyObjects[i].position.y - _firstBomb_1.waveLevel.wave) &&
-                                        _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                        _firstBomb_1.model.position.y === (destroyObjects[i].position.y + _firstBomb_1.waveLevel.wave) &&
-                                            _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                        _firstBomb_1.model.position.x === (destroyObjects[i].position.x - _firstBomb_1.waveLevel.wave) &&
-                                            _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                        _firstBomb_1.model.position.x === (destroyObjects[i].position.x + _firstBomb_1.waveLevel.wave) &&
-                                            _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                        _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                            _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                        // ..done ->
-                                        WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
-                                        for (var o = 0; o < objectContainers.length; o++) {
-                                            objectContainers[o].removeChild(destroyObjects[i]);
+                var _loop_1 = function() {
+                    if (players[o].control) {
+                        currentPlayer = players[o];
+                        console.log(currentPlayer);
+                        if (players[o].bombsCount > 0) {
+                            // players[o].bombsCount--;
+                            showBombsValue(players[o].bombsCount, staticBombsCount);
+                            if (WORLD_MAP.containers.bombs.children.length === 0) {
+                                bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
+                                WORLD_MAP.containers.bombs.addChild(bomb.model);
+                                if (bomb) {
+                                    var _firstBomb_1 = bomb;
+                                    setTimeout(function () {
+                                        if (destroyObjects.length !== 0) {
+                                            for (var i = 0; i < destroyObjects.length; i++) {
+                                                if (_firstBomb_1.model.position.y === (destroyObjects[i].position.y - _firstBomb_1.waveLevel.wave) &&
+                                                    _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                    _firstBomb_1.model.position.y === (destroyObjects[i].position.y + _firstBomb_1.waveLevel.wave) &&
+                                                        _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                    _firstBomb_1.model.position.x === (destroyObjects[i].position.x - _firstBomb_1.waveLevel.wave) &&
+                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                    _firstBomb_1.model.position.x === (destroyObjects[i].position.x + _firstBomb_1.waveLevel.wave) &&
+                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                    _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
+                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
+                                                    // ..done ->
+                                                    WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                    for (var z = 0; z < objectContainers.length; z++) {
+                                                        objectContainers[z].removeChild(destroyObjects[i]);
+                                                    }
+                                                    checkPlayer();
+                                                }
+                                                else {
+                                                    WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                    checkPlayer();
+                                                }
+                                            }
+                                            playerPlayerAlive();
                                         }
-                                        checkPlayer();
-                                    }
-                                    else {
-                                        WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
-                                        checkPlayer();
-                                    }
-                                }
-                                playerPlayerAlive();
-                            }
-                            else {
-                                objectContainers[i].removeChild(_firstBomb_1.model);
-                                checkPlayer();
-                                playerPlayerAlive();
-                            }
-                        }, 1000);
-                    }
-                }
-                else if (player_1.model.position.x !== bomb.model.position.x || player_1.model.position.y !== bomb.model.position.y) {
-                    bomb = new Bomb({ x: player_1.model.position.x, y: player_1.model.position.y, waveLevel: 1 });
-                    WORLD_MAP.containers.bombs.addChild(bomb.model);
-                    if (bomb) {
-                        var _otherBomb_1 = bomb;
-                        setTimeout(function () {
-                            if (destroyObjects.length !== 0) {
-                                for (var i = 0; i < destroyObjects.length; i++) {
-                                    if (_otherBomb_1.model.position.y === (destroyObjects[i].position.y - _otherBomb_1.waveLevel.wave) &&
-                                        _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                        _otherBomb_1.model.position.y === (destroyObjects[i].position.y + _otherBomb_1.waveLevel.wave) &&
-                                            _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                        _otherBomb_1.model.position.x === (destroyObjects[i].position.x - _otherBomb_1.waveLevel.wave) &&
-                                            _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                        _otherBomb_1.model.position.x === (destroyObjects[i].position.x + _otherBomb_1.waveLevel.wave) &&
-                                            _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                        _otherBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                            _otherBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                        // ..done ->
-                                        WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                        for (var o = 0; o < objectContainers.length; o++) {
-                                            objectContainers[o].removeChild(destroyObjects[i]);
+                                        else {
+                                            objectContainers[i].removeChild(_firstBomb_1.model);
+                                            checkPlayer();
+                                            playerPlayerAlive();
                                         }
-                                        checkPlayer();
-                                    }
-                                    else {
-                                        WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                        checkPlayer();
-                                    }
+                                    }, 1000);
                                 }
-                                playerPlayerAlive();
                             }
-                            else {
-                                WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                checkPlayer();
-                                playerPlayerAlive();
+                            if (players[o].position.x !== bomb.model.position.x || players[o].position.y !== bomb.model.position.y) {
+                                bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
+                                WORLD_MAP.containers.bombs.addChild(bomb.model);
+                                if (bomb) {
+                                    var _otherBomb_1 = bomb;
+                                    setTimeout(function () {
+                                        if (destroyObjects.length !== 0) {
+                                            for (var i = 0; i < destroyObjects.length; i++) {
+                                                if (_otherBomb_1.model.position.y === (destroyObjects[i].position.y - _otherBomb_1.waveLevel.wave) &&
+                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                    _otherBomb_1.model.position.y === (destroyObjects[i].position.y + _otherBomb_1.waveLevel.wave) &&
+                                                        _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                    _otherBomb_1.model.position.x === (destroyObjects[i].position.x - _otherBomb_1.waveLevel.wave) &&
+                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                    _otherBomb_1.model.position.x === (destroyObjects[i].position.x + _otherBomb_1.waveLevel.wave) &&
+                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x &&
+                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y) {
+                                                    // ..done ->
+                                                    WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                                    for (var z = 0; z < objectContainers.length; z++) {
+                                                        objectContainers[z].removeChild(destroyObjects[i]);
+                                                    }
+                                                    checkPlayer();
+                                                }
+                                                else {
+                                                    WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                                    checkPlayer();
+                                                }
+                                            }
+                                            playerPlayerAlive();
+                                        }
+                                        else {
+                                            WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                            checkPlayer();
+                                            playerPlayerAlive();
+                                        }
+                                    }, 1000);
+                                }
                             }
-                        }, 1000);
-                    }
-                }
-            });
+                        }
+                    } // End Main If
+                };
+                var currentPlayer;
+                for (var o = 0; o < players.length; o++) {
+                    _loop_1();
+                } // End Main For
+            }); // End createArrays Function
         }
     };
 }
@@ -982,8 +987,7 @@ var ui;
             }
             else {
                 $('#chat').stop().animate({
-                    height: $('body').innerHeight() - $('#bar').innerHeight() + 'px',
-                    overflowY: 'none'
+                    height: $('body').innerHeight() - $('#bar').innerHeight() + 'px'
                 }, 300);
                 $('#bar').stop().animate({ bottom: 0 }, 300);
             }
@@ -1003,8 +1007,9 @@ var ui;
     }
     // Bar
     $('#game').append('<div id="bar"></div>');
-    $('#game #bar').append('<span>hp: <b>100 / 100</b></span>');
-    $('#game #bar').append('<span>bombs: <b>∞ / ∞</b></span>');
+    var staticBombsCount = player_1.model.bombsCount;
+    $('#game #bar').append('<span class="hp">hp: <b>100 / 100</b></span>');
+    $('#game #bar').append('<span class="bombs">bombs: <b>' + staticBombsCount + ' / ' + staticBombsCount + '</b></span>');
     // Asides
     $('body').css({ height: $(window).innerHeight() });
     $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });

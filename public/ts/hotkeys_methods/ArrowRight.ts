@@ -58,51 +58,49 @@ function keyArrowRight() {
       createArrays(function() {
 
         for (var o = 0; o < players.length; o++) {
-          players[o].canMove.Right = true;
-        }
+          if (players[o].control) {
+            players[o].canMove.Right = true;
 
-        for (var j = 0; j < blocked_objects.length; j++) {
+            for (var j = 0; j < blocked_objects.length; j++) {
 
-          if (blocked_objects[j].blocked) {
-            for (var i = 0; i < objects.length; i++) {
-              for (var o = 0; o < players.length; o++) {
-                if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
-                      players[o].position.y != objects[i].position.y))
-                {
-                  players[o].canMove.Right = false;
+              if (blocked_objects[j].blocked) {
+                for (var i = 0; i < objects.length; i++) {
+                  if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
+                        players[o].position.y != objects[i].position.y))
+                  {
+                    players[o].canMove.Right = false;
+                  }
+                }
+              } else {
+                for (var i = 0; i < objects[j].children.length; i++) {
+                  if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
+                        players[o].position.y != objects[i].position.y))
+                  {
+                    players[o].canMove.Right = true;
+                  }
                 }
               }
-            }
-          } else {
-            for (var i = 0; i < objects[j].children.length; i++) {
-              for (var o = 0; o < players.length; o++) {
-                if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                      players[o].position.y != objects[i].position.y))
-                {
-                  players[o].canMove.Right = true;
-                }
+
+            } // End main For
+
+            if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
+              players[o].position.x += 1 * players[o].speed;
+              if (GAME.Display.scroll) {      
+                players[o].camera.x += 1 * players[o].speed;
+                players[o].camera.move(players[o].camera.x, 'x');
               }
             }
-          }
 
-        } // End main For
+            socket.emit('player_' + (o + 1) + ' moving', players[o].position);
 
-        for (var o = 0; o < players.length; o++) {
-          if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
-            players[o].position.x += 1 * players[o].speed;
-            if (GAME.Display.scroll) {      
-              players[o].camera.x += 1 * players[o].speed;
-              players[o].camera.move(players[o].camera.x, 'x');
-            }
-          }
+           }   // End if -> players.controls
 
-          socket.emit('player_' + (o + 1) + ' moving', players[o].position);
-        }    
+        }   // End Players For 
 
       }); // End createArrays Function
 
-    } // End Pressed Function
+    }   // End Pressed Function
 
-  } // End Return
+  }   // End Return
 
-} // End Function
+}   // End Function

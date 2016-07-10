@@ -5,6 +5,7 @@ var exampleBlock = new Block({
   destroy: false
 });
 
+var examplePlayer = new Sand({ x: 0, y: 0 });
 var exampleWall = new Wall({ x: 0, y: 0 });
 var exampleBox = new Box({ x: 0, y: 0 });
 var exampleBomb = new Bomb({ x: 0, y: 0, waveLevel: 1 });

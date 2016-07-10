@@ -6,7 +6,6 @@ class Player extends Block
   model;
   speed;
   alive = true;
-  bombsCount = 3;
   coords = {
     x: null,
     y: null
@@ -22,6 +21,8 @@ class Player extends Block
     this.model = new PIXI.Sprite(this.texture);
     this.model._a_name = 'player';
     this.model.control = false;
+
+    this.model.bombsCount = 2;
 
     this.model.position.x = params.x;
     this.model.position.y = params.y;

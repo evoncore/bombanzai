@@ -47,10 +47,6 @@ socket.on('player id', function(id) {
   if (id == 3) {
     player_3.model.control = true;
   }
-
-  console.log(player_1.model.control);
-  console.log(player_2.model.control);
-  console.log(player_3.model.control);
 });
 
 /// <reference path="map.ts"/>

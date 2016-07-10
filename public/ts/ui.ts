@@ -41,8 +41,7 @@ module ui {
         $('#info').css({ overflowY: 'auto' });
       } else {
         $('#chat').stop().animate({
-          height: $('body').innerHeight() - $('#bar').innerHeight() + 'px',
-          overflowY: 'none'
+          height: $('body').innerHeight() - $('#bar').innerHeight() + 'px'
         }, 300);
         $('#bar').stop().animate({bottom: 0}, 300);
       }
@@ -73,9 +72,10 @@ module ui {
   // Bar
 
   $('#game').append('<div id="bar"></div>');
+  var staticBombsCount = player_1.model.bombsCount;
 
-  $('#game #bar').append('<span>hp: <b>100 / 100</b></span>');
-  $('#game #bar').append('<span>bombs: <b>∞ / ∞</b></span>');
+  $('#game #bar').append('<span class="hp">hp: <b>100 / 100</b></span>');
+  $('#game #bar').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
 
 
   // Asides
