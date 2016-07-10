@@ -53,6 +53,10 @@ module.exports = function(server) {
       // clients.splice(clients.indexOf(socket), 1);
       console.log('user disconnected');
     });
+    io.engine.pingTimeout = 60000;
+    io.engine.pingInterval = 1000;
+
+    io.emit('pong', {ping: 1});
 
     socket.emit('player id', clients);
 

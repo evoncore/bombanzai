@@ -10,7 +10,7 @@ var socket = io('', {
 });
 var ul = $('#chat ul');
 var form = $('#chat form');
-var test;
+var startTime;
 form.on('submit', function (e) { e.preventDefault(); });
 socket
     .on('chat message', function (msg) {
@@ -77,6 +77,12 @@ socket
     .on('reconnect_failed', function () {
     ul.append('<li class="sys-msg">Соединение закрыто</li>');
     ;
+});
+socket.on('pong', function (data) {
+    var data = data;
+    if (data && typeof data != 'object') {
+        $('#ping span').text('ping: ' + data);
+    }
 });
 function sendMessage() {
     socket.emit('chat message', $('#user-message').val());
@@ -751,7 +757,6 @@ function keySpacebar() {
     }
     return {
         pressed: function () {
-            console.log(destroyObjects.length);
             var _loop_1 = function() {
                 if (players[o].control) {
                     currentPlayer = players[o];
@@ -819,7 +824,8 @@ function keySpacebar() {
                                                 // ..done ->
                                                 WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
                                                 for (var z = 0; z < objectContainers.length; z++) {
-                                                    objectContainers[z].removeChild(destroyObjects[i]);
+                                                    // findArrayValue - global function from ./functions.ts
+                                                    socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                                                 }
                                                 checkPlayer();
                                             }

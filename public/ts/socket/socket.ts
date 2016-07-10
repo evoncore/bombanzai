@@ -7,7 +7,7 @@ var socket = io('', {
 
 let ul = $('#chat ul');
 var form = $('#chat form');
-var test;
+var startTime;
 
 form.on('submit', function(e) { e.preventDefault(); });
 
@@ -83,6 +83,13 @@ socket
   .on('reconnect_failed', function() {
     ul.append('<li class="sys-msg">Соединение закрыто</li>');;
   })
+
+  socket.on('pong', function(data) {
+    var data = data;
+    if (data && typeof data != 'object') {
+      $('#ping span').text('ping: ' + data);
+    }
+  });
 
 function sendMessage() {
   socket.emit('chat message', $('#user-message').val());

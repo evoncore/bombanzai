@@ -25,8 +25,6 @@ function keySpacebar() {
 
     pressed: function() {
 
-        console.log(destroyObjects.length);
-
         for (var o = 0; o < players.length; o++) {
           if (players[o].control) {
           var currentPlayer = players[o];
@@ -110,7 +108,8 @@ function keySpacebar() {
                           // ..done ->
                           WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
                           for (let z = 0; z < objectContainers.length; z++) {
-                            objectContainers[z].removeChild(destroyObjects[i]);
+                            // findArrayValue - global function from ./functions.ts
+                            socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
                           checkPlayer();
                         } else {
