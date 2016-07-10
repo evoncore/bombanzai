@@ -29,6 +29,26 @@ module.exports = function(server) {
       socket.broadcast.emit('player_3 coords', coords);
     });
 
+    socket.on('player_1 face', function(face) {
+      socket.emit('player_1 face_res', face);
+      socket.broadcast.emit('player_1 face_res', face);
+    });
+
+    socket.on('player_2 face', function(face) {
+      socket.emit('player_2 face_res', face);
+      socket.broadcast.emit('player_2 face_res', face);
+    });
+
+    socket.on('player_3 face', function(face) {
+      socket.emit('player_3 face_res', face);
+      socket.broadcast.emit('player_3 face_res', face);
+    });
+
+    socket.on('bomb bang', function(bomb_v) {
+      socket.emit('bomb bang_res', bomb_v);
+      socket.broadcast.emit('bomb bang_res', bomb_v);
+    });
+
     socket.on('disconnect', function() {
       // clients.splice(clients.indexOf(socket), 1);
       console.log('user disconnected');

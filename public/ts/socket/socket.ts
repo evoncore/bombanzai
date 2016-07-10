@@ -7,6 +7,7 @@ var socket = io('', {
 
 let ul = $('#chat ul');
 var form = $('#chat form');
+var test;
 
 form.on('submit', function(e) { e.preventDefault(); });
 
@@ -59,6 +60,21 @@ socket
         player_3.model.position.y = player_coords.y;
       });
 
+    socket
+      .on('player_1 face_res', function(face_res) {
+        player_1.model.texture = PIXI.Texture.fromImage(face_res);
+      })
+      .on('player_2 face_res', function(face_res) {
+        player_2.model.texture = PIXI.Texture.fromImage(face_res);
+      })
+      .on('player_3 face_res', function(face_res) {
+        player_3.model.texture = PIXI.Texture.fromImage(face_res);
+      })
+      .on('bomb bang_res', function(bomb_value) {
+        for (let z = 0; z < objectContainers.length; z++) {
+          objectContainers[z].removeChild(destroyObjects[bomb_value]);
+        }
+      });
   })
   .on('disconnect', function() {
     ul.append('<li class="sys-msg">Соединение потеряно</li>');;

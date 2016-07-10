@@ -25,54 +25,18 @@ function keySpacebar() {
 
     pressed: function() {
 
-      var destroyObjects = [];
-      var objectContainers = [];
-      var players = [];
-      var staticBombsCount = player_1.model.bombsCount;
+        console.log(destroyObjects.length);
 
-      function createArrays(callback) {
-
-        for (let key in WORLD_MAP.containers) {
-          let push = false;
-
-          for (let key2 in WORLD_MAP.containers[key].children) {
-            if (WORLD_MAP.containers[key].children[key2].destroy) {
-              push = true;
-            }
-          }
-
-          for (let key3 in WORLD_MAP.containers[key].children) {
-            if (push) {
-              destroyObjects.push(WORLD_MAP.containers[key].children[key3]);
-            }
-          }
-        }
-
-        // Add Players
-        for (let player_ in WORLD_MAP.containers.players.children) {
-          players.push(WORLD_MAP.containers.players.children[player_]);
-        }
-
-        for (let key4 in WORLD_MAP.containers) {
-          objectContainers.push(WORLD_MAP.containers[key4]);
-        }
-
-        callback();
-      }
-
-      createArrays(function() {
         for (var o = 0; o < players.length; o++) {
           if (players[o].control) {
           var currentPlayer = players[o];
-          console.log(currentPlayer);
 
-            if (players[o].bombsCount > 0) {
-              // players[o].bombsCount--;
-              showBombsValue(players[o].bombsCount, staticBombsCount);
+            if (currentPlayer.bombsCount > 0) {
+              showBombsValue(currentPlayer.bombsCount, staticBombsCount);
 
               if (WORLD_MAP.containers.bombs.children.length === 0)
               {
-                  bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
+                  bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
                   WORLD_MAP.containers.bombs.addChild(bomb.model);
 
                 if (bomb) {
@@ -98,7 +62,8 @@ function keySpacebar() {
                           // ..done ->
                           WORLD_MAP.containers.bombs.removeChild(_firstBomb.model);
                           for (let z = 0; z < objectContainers.length; z++) {
-                            objectContainers[z].removeChild(destroyObjects[i]);
+                            // findArrayValue - global function from ./functions.ts
+                            socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
                           checkPlayer();
                         } else {
@@ -118,10 +83,10 @@ function keySpacebar() {
                 }
               }
 
-              if (players[o].position.x !== bomb.model.position.x || players[o].position.y !== bomb.model.position.y)
+              if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y)
 
               {
-                bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
+                bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
                 WORLD_MAP.containers.bombs.addChild(bomb.model);
 
                 if (bomb) {
@@ -166,7 +131,6 @@ function keySpacebar() {
             }
           } // End Main If
         } // End Main For
-      }); // End createArrays Function
 
     }
 

@@ -91,6 +91,7 @@ function keyArrowRight() {
               }
             }
 
+            socket.emit('player_' + (o + 1) + ' face', '../img/player_'+(o + 1)+'_right.png');
             socket.emit('player_' + (o + 1) + ' moving', players[o].position);
 
            }   // End if -> players.controls

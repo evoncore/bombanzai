@@ -22,7 +22,7 @@ class Player extends Block
     this.model._a_name = 'player';
     this.model.control = false;
 
-    this.model.bombsCount = 2;
+    this.model.bombsCount = 1;
 
     this.model.position.x = params.x;
     this.model.position.y = params.y;

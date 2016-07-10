@@ -21,6 +21,7 @@ class Bomb extends Block
 
     this.model.position.x = params.x;
     this.model.position.y = params.y;
+
     this.model.width = this.size;
     this.model.height = this.size;
 

@@ -3,8 +3,8 @@ class Game
 {
 
   Display = {
-    width: 300,
-    height: 300,
+    width: 340,
+    height: 340,
     scroll: false
   };
 

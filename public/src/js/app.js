@@ -10,6 +10,7 @@ var socket = io('', {
 });
 var ul = $('#chat ul');
 var form = $('#chat form');
+var test;
 form.on('submit', function (e) { e.preventDefault(); });
 socket
     .on('chat message', function (msg) {
@@ -52,6 +53,21 @@ socket
         player_3.model.position.x = player_coords.x;
         player_3.model.position.y = player_coords.y;
     });
+    socket
+        .on('player_1 face_res', function (face_res) {
+        player_1.model.texture = PIXI.Texture.fromImage(face_res);
+    })
+        .on('player_2 face_res', function (face_res) {
+        player_2.model.texture = PIXI.Texture.fromImage(face_res);
+    })
+        .on('player_3 face_res', function (face_res) {
+        player_3.model.texture = PIXI.Texture.fromImage(face_res);
+    })
+        .on('bomb bang_res', function (bomb_value) {
+        for (var z = 0; z < objectContainers.length; z++) {
+            objectContainers[z].removeChild(destroyObjects[bomb_value]);
+        }
+    });
 })
     .on('disconnect', function () {
     ul.append('<li class="sys-msg">Соединение потеряно</li>');
@@ -68,14 +84,29 @@ function sendMessage() {
     return false;
 }
 ;
+function returnValue(value) {
+    return {
+        v: value
+    };
+}
+function findArrayValue(array, value) {
+    if (array.indexOf) {
+        return array.indexOf(value);
+    }
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === value)
+            return i;
+    }
+    return -1;
+}
 function slicePixels(obj) {
     return Number(obj.length == 5 ? obj.slice(0, 3) : obj.slice(0, 2));
 }
 var Game = (function () {
     function Game() {
         this.Display = {
-            width: 300,
-            height: 300,
+            width: 340,
+            height: 340,
             scroll: false
         };
     }
@@ -144,7 +175,7 @@ var Player = (function (_super) {
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'player';
         this.model.control = false;
-        this.model.bombsCount = 2;
+        this.model.bombsCount = 1;
         this.model.position.x = params.x;
         this.model.position.y = params.y;
         this.model.width = this.size;
@@ -281,10 +312,13 @@ var exampleSand = new Sand({ x: 0, y: 0 });
 var GAME = new Game;
 var WORLD_MAP = new WorldMap;
 var player_1 = new Player({ x: 0, y: 0 });
-var player_2 = new Player({ x: 280, y: 280 }, PIXI.Texture.fromImage('../img/player_2.png'));
-var player_3 = new Player({ x: 0, y: 280 }, PIXI.Texture.fromImage('../img/player_3.png'));
+var player_2 = new Player({ x: 320, y: 320 }, PIXI.Texture.fromImage('../img/player_2.png'));
+var player_3 = new Player({ x: 0, y: 320 }, PIXI.Texture.fromImage('../img/player_3.png'));
 socket.on('player id', function (id) {
     var num = id;
+    if (id.length >= 4) {
+        id = 0;
+    }
     if (id > 3) {
         id = 0;
     }
@@ -307,6 +341,33 @@ function animate() {
     requestAnimationFrame(animate);
     renderer.render(WORLD_MAP.map);
 }
+var destroyObjects = [];
+var objectContainers = [];
+var players = [];
+var staticBombsCount = player_1.model.bombsCount;
+// Add Destroy Objects
+createMap(function () {
+    for (var key in WORLD_MAP.containers) {
+        var push = false;
+        for (var key2 in WORLD_MAP.containers[key].children) {
+            if (WORLD_MAP.containers[key].children[key2].destroy) {
+                push = true;
+            }
+        }
+        for (var key3 in WORLD_MAP.containers[key].children) {
+            if (push) {
+                destroyObjects.push(WORLD_MAP.containers[key].children[key3]);
+            }
+        }
+    }
+    // Add Players
+    for (var player_ in WORLD_MAP.containers.players.children) {
+        players.push(WORLD_MAP.containers.players.children[player_]);
+    }
+    for (var key4 in WORLD_MAP.containers) {
+        objectContainers.push(WORLD_MAP.containers[key4]);
+    }
+});
 /// <reference path="hotkeys.ts"/>
 // UI
 /// <reference path="ui.ts"/> 
@@ -422,6 +483,7 @@ function keyArrowDown() {
                                 players[o].camera.move(players[o].camera.y, 'y');
                             }
                         }
+                        socket.emit('player_' + (o + 1) + ' face', '../img/player_' + (o + 1) + '_bottom.png');
                         socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                     } // End if -> players.controls
                 } // End Players For
@@ -501,6 +563,7 @@ function keyArrowUp() {
                                 players[o].camera.move(players[o].camera.y, 'y');
                             }
                         }
+                        socket.emit('player_' + (o + 1) + ' face', '../img/player_' + (o + 1) + '_top.png');
                         socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                     } // End if -> players.controls
                 } // End Players For 
@@ -580,6 +643,7 @@ function keyArrowRight() {
                                 players[o].camera.move(players[o].camera.x, 'x');
                             }
                         }
+                        socket.emit('player_' + (o + 1) + ' face', '../img/player_' + (o + 1) + '_right.png');
                         socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                     } // End if -> players.controls
                 } // End Players For 
@@ -659,6 +723,7 @@ function keyArrowLeft() {
                                 players[o].camera.move(players[o].camera.x, 'x');
                             }
                         }
+                        socket.emit('player_' + (o + 1) + ' face', '../img/player_' + (o + 1) + '_left.png');
                         socket.emit('player_' + (o + 1) + ' moving', players[o].position);
                     } // End if -> players.controls
                 } // End Players For
@@ -686,129 +751,100 @@ function keySpacebar() {
     }
     return {
         pressed: function () {
-            var destroyObjects = [];
-            var objectContainers = [];
-            var players = [];
-            var staticBombsCount = player_1.model.bombsCount;
-            function createArrays(callback) {
-                for (var key in WORLD_MAP.containers) {
-                    var push = false;
-                    for (var key2 in WORLD_MAP.containers[key].children) {
-                        if (WORLD_MAP.containers[key].children[key2].destroy) {
-                            push = true;
-                        }
-                    }
-                    for (var key3 in WORLD_MAP.containers[key].children) {
-                        if (push) {
-                            destroyObjects.push(WORLD_MAP.containers[key].children[key3]);
-                        }
-                    }
-                }
-                // Add Players
-                for (var player_ in WORLD_MAP.containers.players.children) {
-                    players.push(WORLD_MAP.containers.players.children[player_]);
-                }
-                for (var key4 in WORLD_MAP.containers) {
-                    objectContainers.push(WORLD_MAP.containers[key4]);
-                }
-                callback();
-            }
-            createArrays(function () {
-                var _loop_1 = function() {
-                    if (players[o].control) {
-                        currentPlayer = players[o];
-                        console.log(currentPlayer);
-                        if (players[o].bombsCount > 0) {
-                            // players[o].bombsCount--;
-                            showBombsValue(players[o].bombsCount, staticBombsCount);
-                            if (WORLD_MAP.containers.bombs.children.length === 0) {
-                                bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
-                                WORLD_MAP.containers.bombs.addChild(bomb.model);
-                                if (bomb) {
-                                    var _firstBomb_1 = bomb;
-                                    setTimeout(function () {
-                                        if (destroyObjects.length !== 0) {
-                                            for (var i = 0; i < destroyObjects.length; i++) {
-                                                if (_firstBomb_1.model.position.y === (destroyObjects[i].position.y - _firstBomb_1.waveLevel.wave) &&
+            console.log(destroyObjects.length);
+            var _loop_1 = function() {
+                if (players[o].control) {
+                    currentPlayer = players[o];
+                    if (currentPlayer.bombsCount > 0) {
+                        showBombsValue(currentPlayer.bombsCount, staticBombsCount);
+                        if (WORLD_MAP.containers.bombs.children.length === 0) {
+                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
+                            WORLD_MAP.containers.bombs.addChild(bomb.model);
+                            if (bomb) {
+                                var _firstBomb_1 = bomb;
+                                setTimeout(function () {
+                                    if (destroyObjects.length !== 0) {
+                                        for (var i = 0; i < destroyObjects.length; i++) {
+                                            if (_firstBomb_1.model.position.y === (destroyObjects[i].position.y - _firstBomb_1.waveLevel.wave) &&
+                                                _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                _firstBomb_1.model.position.y === (destroyObjects[i].position.y + _firstBomb_1.waveLevel.wave) &&
                                                     _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                    _firstBomb_1.model.position.y === (destroyObjects[i].position.y + _firstBomb_1.waveLevel.wave) &&
-                                                        _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                    _firstBomb_1.model.position.x === (destroyObjects[i].position.x - _firstBomb_1.waveLevel.wave) &&
-                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                    _firstBomb_1.model.position.x === (destroyObjects[i].position.x + _firstBomb_1.waveLevel.wave) &&
-                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                    _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                                        _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                                    // ..done ->
-                                                    WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
-                                                    for (var z = 0; z < objectContainers.length; z++) {
-                                                        objectContainers[z].removeChild(destroyObjects[i]);
-                                                    }
-                                                    checkPlayer();
+                                                _firstBomb_1.model.position.x === (destroyObjects[i].position.x - _firstBomb_1.waveLevel.wave) &&
+                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                _firstBomb_1.model.position.x === (destroyObjects[i].position.x + _firstBomb_1.waveLevel.wave) &&
+                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
+                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
+                                                // ..done ->
+                                                WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                for (var z = 0; z < objectContainers.length; z++) {
+                                                    // findArrayValue - global function from ./functions.ts
+                                                    socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                                                 }
-                                                else {
-                                                    WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
-                                                    checkPlayer();
-                                                }
+                                                checkPlayer();
                                             }
-                                            playerPlayerAlive();
-                                        }
-                                        else {
-                                            objectContainers[i].removeChild(_firstBomb_1.model);
-                                            checkPlayer();
-                                            playerPlayerAlive();
-                                        }
-                                    }, 1000);
-                                }
-                            }
-                            if (players[o].position.x !== bomb.model.position.x || players[o].position.y !== bomb.model.position.y) {
-                                bomb = new Bomb({ x: players[o].position.x, y: players[o].position.y, waveLevel: 1 });
-                                WORLD_MAP.containers.bombs.addChild(bomb.model);
-                                if (bomb) {
-                                    var _otherBomb_1 = bomb;
-                                    setTimeout(function () {
-                                        if (destroyObjects.length !== 0) {
-                                            for (var i = 0; i < destroyObjects.length; i++) {
-                                                if (_otherBomb_1.model.position.y === (destroyObjects[i].position.y - _otherBomb_1.waveLevel.wave) &&
-                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                    _otherBomb_1.model.position.y === (destroyObjects[i].position.y + _otherBomb_1.waveLevel.wave) &&
-                                                        _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                    _otherBomb_1.model.position.x === (destroyObjects[i].position.x - _otherBomb_1.waveLevel.wave) &&
-                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                    _otherBomb_1.model.position.x === (destroyObjects[i].position.x + _otherBomb_1.waveLevel.wave) &&
-                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                                        _otherBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                                    // ..done ->
-                                                    WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                                    for (var z = 0; z < objectContainers.length; z++) {
-                                                        objectContainers[z].removeChild(destroyObjects[i]);
-                                                    }
-                                                    checkPlayer();
-                                                }
-                                                else {
-                                                    WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                                    checkPlayer();
-                                                }
+                                            else {
+                                                WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                checkPlayer();
                                             }
-                                            playerPlayerAlive();
                                         }
-                                        else {
-                                            WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
-                                            checkPlayer();
-                                            playerPlayerAlive();
-                                        }
-                                    }, 1000);
-                                }
+                                        playerPlayerAlive();
+                                    }
+                                    else {
+                                        objectContainers[i].removeChild(_firstBomb_1.model);
+                                        checkPlayer();
+                                        playerPlayerAlive();
+                                    }
+                                }, 1000);
                             }
                         }
-                    } // End Main If
-                };
-                var currentPlayer;
-                for (var o = 0; o < players.length; o++) {
-                    _loop_1();
-                } // End Main For
-            }); // End createArrays Function
+                        if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y) {
+                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
+                            WORLD_MAP.containers.bombs.addChild(bomb.model);
+                            if (bomb) {
+                                var _otherBomb_1 = bomb;
+                                setTimeout(function () {
+                                    if (destroyObjects.length !== 0) {
+                                        for (var i = 0; i < destroyObjects.length; i++) {
+                                            if (_otherBomb_1.model.position.y === (destroyObjects[i].position.y - _otherBomb_1.waveLevel.wave) &&
+                                                _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                _otherBomb_1.model.position.y === (destroyObjects[i].position.y + _otherBomb_1.waveLevel.wave) &&
+                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
+                                                _otherBomb_1.model.position.x === (destroyObjects[i].position.x - _otherBomb_1.waveLevel.wave) &&
+                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                _otherBomb_1.model.position.x === (destroyObjects[i].position.x + _otherBomb_1.waveLevel.wave) &&
+                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
+                                                _otherBomb_1.model.position.x === destroyObjects[i].position.x &&
+                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y) {
+                                                // ..done ->
+                                                WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                                for (var z = 0; z < objectContainers.length; z++) {
+                                                    objectContainers[z].removeChild(destroyObjects[i]);
+                                                }
+                                                checkPlayer();
+                                            }
+                                            else {
+                                                WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                                checkPlayer();
+                                            }
+                                        }
+                                        playerPlayerAlive();
+                                    }
+                                    else {
+                                        WORLD_MAP.containers.bombs.removeChild(_otherBomb_1.model);
+                                        checkPlayer();
+                                        playerPlayerAlive();
+                                    }
+                                }, 1000);
+                            }
+                        }
+                    }
+                } // End Main If
+            };
+            var currentPlayer;
+            for (var o = 0; o < players.length; o++) {
+                _loop_1();
+            } // End Main For
         }
     };
 }
@@ -927,32 +963,167 @@ $(document).on('keydown', function (e) {
 //   });
 // } 
 /// <reference path="app.ts"/>
-var wall_1 = new Wall({ x: 80, y: 40 });
-var wall_2 = new Wall({ x: 160, y: 60 });
-var wall_3 = new Wall({ x: 100, y: 160 });
-var box_1 = new Box({ x: 100, y: 100 });
-var box_2 = new Box({ x: 160, y: 80 });
-var box_3 = new Box({ x: 140, y: 160 });
-var sand_1 = new Sand({ x: 0, y: 120 });
-var sand_2 = new Sand({ x: 0, y: 140 });
-var sand_3 = new Sand({ x: 20, y: 120 });
-var sand_4 = new Sand({ x: 20, y: 140 });
-for (var container in WORLD_MAP.containers) {
-    WORLD_MAP.map.addChild(WORLD_MAP.containers[container]);
+function createMap(callback) {
+    var boxes = [
+        // Player_1 zone
+        new Box({ x: 40, y: 0 }),
+        new Box({ x: 60, y: 0 }),
+        new Box({ x: 0, y: 40 }),
+        new Box({ x: 0, y: 60 }),
+        new Box({ x: 0, y: 80 }),
+        new Box({ x: 0, y: 100 }),
+        new Box({ x: 0, y: 120 }),
+        new Box({ x: 0, y: 140 }),
+        new Box({ x: 20, y: 140 }),
+        new Box({ x: 160, y: 120 }),
+        new Box({ x: 80, y: 80 }),
+        new Box({ x: 100, y: 80 }),
+        new Box({ x: 100, y: 60 }),
+        new Box({ x: 100, y: 100 }),
+        new Box({ x: 80, y: 120 }),
+        new Box({ x: 100, y: 140 }),
+        // Player_2 zone
+        new Box({ x: 280, y: 320 }),
+        new Box({ x: 260, y: 320 }),
+        new Box({ x: 320, y: 280 }),
+        new Box({ x: 320, y: 260 }),
+        new Box({ x: 320, y: 240 }),
+        new Box({ x: 320, y: 220 }),
+        new Box({ x: 320, y: 200 }),
+        new Box({ x: 320, y: 180 }),
+        new Box({ x: 300, y: 180 }),
+        new Box({ x: 240, y: 200 }),
+        new Box({ x: 240, y: 240 }),
+        new Box({ x: 220, y: 180 }),
+        new Box({ x: 220, y: 220 }),
+        new Box({ x: 220, y: 240 }),
+        new Box({ x: 220, y: 260 }),
+        // Player_3 zone
+        new Box({ x: 0, y: 180 }),
+        new Box({ x: 0, y: 200 }),
+        new Box({ x: 0, y: 220 }),
+        new Box({ x: 0, y: 240 }),
+        new Box({ x: 0, y: 260 }),
+        new Box({ x: 0, y: 280 }),
+        new Box({ x: 40, y: 320 }),
+        new Box({ x: 60, y: 320 }),
+        new Box({ x: 80, y: 200 }),
+        new Box({ x: 100, y: 180 }),
+        new Box({ x: 100, y: 220 }),
+        new Box({ x: 100, y: 240 }),
+        new Box({ x: 100, y: 260 }),
+        new Box({ x: 80, y: 240 }),
+        // Neutral zone
+        new Box({ x: 320, y: 120 }),
+        new Box({ x: 320, y: 140 }),
+        new Box({ x: 300, y: 140 }),
+        // Center
+        new Box({ x: 0, y: 160 }),
+        new Box({ x: 120, y: 160 }),
+        new Box({ x: 160, y: 200 }),
+        new Box({ x: 200, y: 160 }),
+        new Box({ x: 320, y: 160 }),
+    ];
+    var walls = [
+        // Player_1 zone
+        new Wall({ x: 40, y: 20 }),
+        new Wall({ x: 20, y: 40 }),
+        new Wall({ x: 20, y: 60 }),
+        new Wall({ x: 20, y: 120 }),
+        new Wall({ x: 120, y: 20 }),
+        new Wall({ x: 160, y: 20 }),
+        new Wall({ x: 160, y: 40 }),
+        new Wall({ x: 160, y: 60 }),
+        new Wall({ x: 160, y: 80 }),
+        new Wall({ x: 160, y: 100 }),
+        new Wall({ x: 160, y: 140 }),
+        new Wall({ x: 60, y: 60 }),
+        new Wall({ x: 80, y: 60 }),
+        new Wall({ x: 60, y: 80 }),
+        new Wall({ x: 80, y: 100 }),
+        new Wall({ x: 80, y: 140 }),
+        new Wall({ x: 60, y: 100 }),
+        // Player_2 zone
+        new Wall({ x: 300, y: 200 }),
+        new Wall({ x: 300, y: 280 }),
+        new Wall({ x: 280, y: 300 }),
+        new Wall({ x: 200, y: 300 }),
+        new Wall({ x: 240, y: 180 }),
+        new Wall({ x: 240, y: 220 }),
+        new Wall({ x: 240, y: 260 }),
+        new Wall({ x: 260, y: 240 }),
+        new Wall({ x: 260, y: 260 }),
+        // Player_3 zone
+        new Wall({ x: 20, y: 280 }),
+        new Wall({ x: 40, y: 300 }),
+        new Wall({ x: 20, y: 200 }),
+        new Wall({ x: 80, y: 180 }),
+        new Wall({ x: 80, y: 220 }),
+        new Wall({ x: 80, y: 260 }),
+        new Wall({ x: 60, y: 240 }),
+        new Wall({ x: 60, y: 260 }),
+        new Wall({ x: 120, y: 300 }),
+        // Neutral zone
+        // 1 column
+        new Wall({ x: 200, y: 20 }),
+        new Wall({ x: 220, y: 20 }),
+        new Wall({ x: 200, y: 40 }),
+        new Wall({ x: 220, y: 40 }),
+        // 2 column
+        new Wall({ x: 280, y: 20 }),
+        new Wall({ x: 300, y: 20 }),
+        new Wall({ x: 280, y: 40 }),
+        new Wall({ x: 300, y: 40 }),
+        // 3 column
+        new Wall({ x: 200, y: 100 }),
+        new Wall({ x: 200, y: 120 }),
+        new Wall({ x: 220, y: 100 }),
+        new Wall({ x: 220, y: 120 }),
+        // 4 column
+        new Wall({ x: 280, y: 100 }),
+        new Wall({ x: 280, y: 120 }),
+        new Wall({ x: 300, y: 100 }),
+        new Wall({ x: 300, y: 120 }),
+        // Center Wall
+        new Wall({ x: 160, y: 160 }),
+        new Wall({ x: 140, y: 160 }),
+        new Wall({ x: 100, y: 160 }),
+        new Wall({ x: 80, y: 160 }),
+        new Wall({ x: 60, y: 160 }),
+        new Wall({ x: 40, y: 160 }),
+        new Wall({ x: 20, y: 160 }),
+        new Wall({ x: 160, y: 300 }),
+        new Wall({ x: 160, y: 280 }),
+        new Wall({ x: 160, y: 260 }),
+        new Wall({ x: 160, y: 240 }),
+        new Wall({ x: 160, y: 220 }),
+        new Wall({ x: 160, y: 180 }),
+        new Wall({ x: 180, y: 160 }),
+        new Wall({ x: 220, y: 160 }),
+        new Wall({ x: 240, y: 160 }),
+        new Wall({ x: 260, y: 160 }),
+        new Wall({ x: 280, y: 160 }),
+        new Wall({ x: 300, y: 160 }),
+        new Wall({ x: 160, y: 320 }),
+        new Wall({ x: 160, y: 0 }),
+    ];
+    for (var container in WORLD_MAP.containers) {
+        WORLD_MAP.map.addChild(WORLD_MAP.containers[container]);
+    }
+    for (var landscape in WORLD_MAP.landscape) {
+        WORLD_MAP.map.addChild(WORLD_MAP.landscape[landscape]);
+    }
+    for (var i = 0; i < boxes.length; i++) {
+        WORLD_MAP.containers.boxes.addChild(boxes[i].model);
+    }
+    for (var i = 0; i < walls.length; i++) {
+        WORLD_MAP.containers.walls.addChild(walls[i].model);
+    }
+    WORLD_MAP.containers.players.addChild(player_1.model);
+    WORLD_MAP.containers.players.addChild(player_2.model);
+    WORLD_MAP.containers.players.addChild(player_3.model);
+    callback();
 }
-for (var landscape in WORLD_MAP.landscape) {
-    WORLD_MAP.map.addChild(WORLD_MAP.landscape[landscape]);
-}
-WORLD_MAP.containers.players.addChild(player_1.model);
-WORLD_MAP.containers.players.addChild(player_2.model);
-WORLD_MAP.containers.players.addChild(player_3.model);
-WORLD_MAP.containers.walls.addChild(wall_1.model);
-WORLD_MAP.containers.walls.addChild(wall_2.model);
-WORLD_MAP.containers.walls.addChild(wall_3.model);
-WORLD_MAP.containers.boxes.addChild(box_1.model);
-WORLD_MAP.containers.boxes.addChild(box_2.model);
-WORLD_MAP.containers.boxes.addChild(box_3.model);
-// WORLD_MAP.landscape.sand.addChild(sand_1.model); 
 /// <reference path="app.ts"/>
 // One Page App
 var ui;
