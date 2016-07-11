@@ -7,8 +7,8 @@
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
 
   const CONTROLS = new Controls;
-  var bomb;
   let two_keys = false;
+  var bomb;
 
   player_1.camera.x += player_1.model.position.x;
   player_1.camera.y += player_1.model.position.y;

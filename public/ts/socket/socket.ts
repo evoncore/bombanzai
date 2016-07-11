@@ -7,7 +7,9 @@ var socket = io('', {
 
 let ul = $('#chat ul');
 var form = $('#chat form');
-var startTime;
+var bombx = {
+  object: null
+};
 
 form.on('submit', function(e) { e.preventDefault(); });
 
@@ -73,6 +75,17 @@ socket
       .on('bomb bang_res', function(bomb_value) {
         for (let z = 0; z < objectContainers.length; z++) {
           objectContainers[z].removeChild(destroyObjects[bomb_value]);
+        }
+      })
+      .on('bomb coords_res', function(bomb_coords_res) {
+        bombx.object = new Bomb({ x: bomb_coords_res.x, y: bomb_coords_res.y, waveLevel: 1 });
+        WORLD_MAP.containers.bombs.addChild(bombx.object.model);
+      })
+      .on('bomb coords_remove_res', function(bomb_coords_res) {
+        for (var i = 0; i < WORLD_MAP.containers.bombs.children.length; ++i) {
+          if (WORLD_MAP.containers.bombs.children[i].position.x == bomb_coords_res.x &&WORLD_MAP.containers.bombs.children[i].position.y == bomb_coords_res.y) {
+            WORLD_MAP.containers.bombs.removeChild(WORLD_MAP.containers.bombs.children[i]);
+          }
         }
       });
   })

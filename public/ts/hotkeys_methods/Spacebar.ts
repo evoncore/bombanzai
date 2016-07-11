@@ -19,8 +19,9 @@ function keySpacebar() {
 
               if (WORLD_MAP.containers.bombs.children.length === 0)
               {
-                  bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
-                  WORLD_MAP.containers.bombs.addChild(bomb.model);
+                socket.emit('bomb coords', currentPlayer.position);
+                bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
+                WORLD_MAP.containers.bombs.addChild(bomb.model);
 
                 if (bomb) {
                   let _firstBomb = bomb;
@@ -43,27 +44,24 @@ function keySpacebar() {
                           ) {
 
                           // ..done ->
-                          WORLD_MAP.containers.bombs.removeChild(_firstBomb.model);
+                          socket.emit('bomb coords_remove', _firstBomb.model.position);
                           for (let z = 0; z < objectContainers.length; z++) {
                             // findArrayValue - global function from ./functions.ts
                             socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
-                          
                         } else {
-                          WORLD_MAP.containers.bombs.removeChild(_firstBomb.model);
+                          socket.emit('bomb coords_remove', _firstBomb.model.position);
                         }
                       }
-
-                      
                     } else {
-                      objectContainers[i].removeChild(_firstBomb.model);
+                      socket.emit('bomb coords_remove', _firstBomb.model.position);
                     }
 
                   }, 1000);
                 }
-              }
+              } 
 
-              if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y)
+              else if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y)
 
               {
                 bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
@@ -71,6 +69,7 @@ function keySpacebar() {
 
                 if (bomb) {
                   let _otherBomb = bomb;
+
                   setTimeout(function() {
                     if (destroyObjects.length !== 0) {
                       for (var i = 0; i < destroyObjects.length; i++) {

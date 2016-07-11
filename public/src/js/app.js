@@ -10,7 +10,9 @@ var socket = io('', {
 });
 var ul = $('#chat ul');
 var form = $('#chat form');
-var startTime;
+var bombx = {
+    object: null
+};
 form.on('submit', function (e) { e.preventDefault(); });
 socket
     .on('chat message', function (msg) {
@@ -66,6 +68,17 @@ socket
         .on('bomb bang_res', function (bomb_value) {
         for (var z = 0; z < objectContainers.length; z++) {
             objectContainers[z].removeChild(destroyObjects[bomb_value]);
+        }
+    })
+        .on('bomb coords_res', function (bomb_coords_res) {
+        bombx.object = new Bomb({ x: bomb_coords_res.x, y: bomb_coords_res.y, waveLevel: 1 });
+        WORLD_MAP.containers.bombs.addChild(bombx.object.model);
+    })
+        .on('bomb coords_remove_res', function (bomb_coords_res) {
+        for (var i = 0; i < WORLD_MAP.containers.bombs.children.length; ++i) {
+            if (WORLD_MAP.containers.bombs.children[i].position.x == bomb_coords_res.x && WORLD_MAP.containers.bombs.children[i].position.y == bomb_coords_res.y) {
+                WORLD_MAP.containers.bombs.removeChild(WORLD_MAP.containers.bombs.children[i]);
+            }
         }
     });
 })
@@ -770,6 +783,7 @@ function keySpacebar() {
                     if (currentPlayer.bombsCount > 0) {
                         showBombsValue(currentPlayer.bombsCount, staticBombsCount);
                         if (WORLD_MAP.containers.bombs.children.length === 0) {
+                            socket.emit('bomb coords', currentPlayer.position);
                             bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
                             WORLD_MAP.containers.bombs.addChild(bomb.model);
                             if (bomb) {
@@ -788,24 +802,24 @@ function keySpacebar() {
                                                 _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
                                                     _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
                                                 // ..done ->
-                                                WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                socket.emit('bomb coords_remove', _firstBomb_1.model.position);
                                                 for (var z = 0; z < objectContainers.length; z++) {
                                                     // findArrayValue - global function from ./functions.ts
                                                     socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                                                 }
                                             }
                                             else {
-                                                WORLD_MAP.containers.bombs.removeChild(_firstBomb_1.model);
+                                                socket.emit('bomb coords_remove', _firstBomb_1.model.position);
                                             }
                                         }
                                     }
                                     else {
-                                        objectContainers[i].removeChild(_firstBomb_1.model);
+                                        socket.emit('bomb coords_remove', _firstBomb_1.model.position);
                                     }
                                 }, 1000);
                             }
                         }
-                        if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y) {
+                        else if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y) {
                             bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
                             WORLD_MAP.containers.bombs.addChild(bomb.model);
                             if (bomb) {
@@ -859,8 +873,8 @@ function keySpacebar() {
 /// <reference path="hotkeys_methods/ArrowLeft.ts"/>
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
 var CONTROLS = new Controls;
-var bomb;
 var two_keys = false;
+var bomb;
 player_1.camera.x += player_1.model.position.x;
 player_1.camera.y += player_1.model.position.y;
 $('canvas').css({

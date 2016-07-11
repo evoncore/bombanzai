@@ -49,8 +49,17 @@ module.exports = function(server) {
       socket.broadcast.emit('bomb bang_res', bomb_v);
     });
 
+    socket.on('bomb coords', function(bomb_coords) {
+      // socket.emit('bomb coords_res', bomb_coords);
+      socket.broadcast.emit('bomb coords_res', bomb_coords);
+    });
+
+    socket.on('bomb coords_remove', function(bomb_coords) {
+      socket.emit('bomb coords_remove_res', bomb_coords);
+      socket.broadcast.emit('bomb coords_remove_res', bomb_coords);
+    });
+
     socket.on('disconnect', function() {
-      // clients.splice(clients.indexOf(socket), 1);
       console.log('user disconnected');
     });
 
