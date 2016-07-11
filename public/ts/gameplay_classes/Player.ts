@@ -11,7 +11,7 @@ class Player extends Block
     y: null
   };
 
-  constructor(params, texture = PIXI.Texture.fromImage('../img/player_1.png')) {
+  constructor(params, texture = PIXI.Texture.fromImage('../img/players/player_1/player_1.png')) {
     super({
       blocked: true,
       destroy: true

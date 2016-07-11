@@ -2,7 +2,7 @@
 class Bomb extends Block
 {
 
-  texture = PIXI.Texture.fromImage('../img/bomb.png');
+  texture = PIXI.Texture.fromImage('../img/players/bomb.png');
   model;
   waveLevel = {
     size: null,

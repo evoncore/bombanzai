@@ -110,25 +110,25 @@ function createMap(callback) {
 
     // Neutral zone
     // 1 column
-    new Wall({ x: 200, y: 20 }),
-    new Wall({ x: 220, y: 20 }),
-    new Wall({ x: 200, y: 40 }),
-    new Wall({ x: 220, y: 40 }),
+    new SpaceBlock({ x: 200, y: 20 }),
+    new SpaceBlock({ x: 220, y: 20 }),
+    new SpaceBlock({ x: 200, y: 40 }),
+    new SpaceBlock({ x: 220, y: 40 }),
     // 2 column
-    new Wall({ x: 280, y: 20 }),
-    new Wall({ x: 300, y: 20 }),
-    new Wall({ x: 280, y: 40 }),
-    new Wall({ x: 300, y: 40 }),
+    new SpaceBlock({ x: 280, y: 20 }),
+    new SpaceBlock({ x: 300, y: 20 }),
+    new SpaceBlock({ x: 280, y: 40 }),
+    new SpaceBlock({ x: 300, y: 40 }),
     // 3 column
-    new Wall({ x: 200, y: 100 }),
-    new Wall({ x: 200, y: 120 }),
-    new Wall({ x: 220, y: 100 }),
-    new Wall({ x: 220, y: 120 }),
+    new SpaceBlock({ x: 200, y: 100 }),
+    new SpaceBlock({ x: 200, y: 120 }),
+    new SpaceBlock({ x: 220, y: 100 }),
+    new SpaceBlock({ x: 220, y: 120 }),
     // 4 column
-    new Wall({ x: 280, y: 100 }),
-    new Wall({ x: 280, y: 120 }),
-    new Wall({ x: 300, y: 100 }),
-    new Wall({ x: 300, y: 120 }),
+    new SpaceBlock({ x: 280, y: 100 }),
+    new SpaceBlock({ x: 280, y: 120 }),
+    new SpaceBlock({ x: 300, y: 100 }),
+    new SpaceBlock({ x: 300, y: 120 }),
 
 
     // Center Wall

@@ -2,7 +2,7 @@
 class Wall extends Block
 {
 
-  texture = PIXI.Texture.fromImage('../img/wall.png');
+  texture = PIXI.Texture.fromImage('../img/map/wall.png');
   model;
 
   constructor(params) {

@@ -1,21 +1,21 @@
 
-class Sand extends Block
+class SpaceBlock extends Block
 {
 
-  texture = PIXI.Texture.fromImage('../img/map/landscape/sand.png');
+  texture = PIXI.Texture.fromImage('../img/map/space_block.png');
   model;
 
   constructor(params) {
     super({
-      blocked: false,
+      blocked: true,
       destroy: false
     });
 
     this.model = new PIXI.Sprite(this.texture);
-    this.model._a_name = 'sand'; 
+    this.model._a_name = 'space block';
 
-    this.model.position.x = params.x ;
-    this.model.position.y = params.y ;
+    this.model.position.x = params.x;
+    this.model.position.y = params.y;
 
     this.model.width = this.size;
     this.model.height = this.size;
@@ -23,6 +23,6 @@ class Sand extends Block
     this.model.size = this.size;
     this.model.blocked = this.blocked;
     this.model.destroy = this.destroy;
-  }
+  };
 
 }

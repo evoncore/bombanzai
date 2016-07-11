@@ -1,4 +1,5 @@
 /// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/game.ts"/>
 
 function keySpacebar() {
 
@@ -15,7 +16,7 @@ function keySpacebar() {
           var currentPlayer = players[o];
 
             if (currentPlayer.bombsCount > 0) {
-              showBombsValue(currentPlayer.bombsCount, staticBombsCount);
+              showBombsValue(currentPlayer.bombsCount, currentPlayer.bombsValue);
 
               if (WORLD_MAP.containers.bombs.children.length === 0)
               {
@@ -56,7 +57,6 @@ function keySpacebar() {
                     } else {
                       socket.emit('bomb coords_remove', _firstBomb.model.position);
                     }
-
                   }, 1000);
                 }
               } 
@@ -87,18 +87,17 @@ function keySpacebar() {
                           ) {
 
                           // ..done ->
-                          WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
+                          socket.emit('bomb coords_remove', _otherBomb.model.position);
                           for (let z = 0; z < objectContainers.length; z++) {
                             // findArrayValue - global function from ./functions.ts
                             socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
                         } else {
-                          WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
+                          socket.emit('bomb coords_remove', _otherBomb.model.position);
                         }
                       }
-                      
                     } else {
-                      WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
+                      socket.emit('bomb coords_remove', _otherBomb.model.position);
                     }
                   }, 1000);
                 }

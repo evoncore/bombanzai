@@ -1,5 +1,5 @@
 /// <reference path="../hotkeys.ts"/>
-/// <reference path="../socket/socket.ts"/>
+/// <reference path="../socket/game.ts"/>
 
 function keyArrowRight() {
 
@@ -59,40 +59,41 @@ function keyArrowRight() {
 
         for (var o = 0; o < players.length; o++) {
           if (players[o].control) {
-            players[o].canMove.Right = true;
+            var currentPlayer = players[o];
+            currentPlayer.canMove.Right = true;
 
             for (var j = 0; j < blocked_objects.length; j++) {
 
               if (blocked_objects[j].blocked) {
                 for (var i = 0; i < objects.length; i++) {
-                  if (!(players[o].position.x != objects[i].position.x - blocked_objects[j].size ||
-                        players[o].position.y != objects[i].position.y))
+                  if (!(currentPlayer.position.x != objects[i].position.x - blocked_objects[j].size ||
+                        currentPlayer.position.y != objects[i].position.y))
                   {
-                    players[o].canMove.Right = false;
+                    currentPlayer.canMove.Right = false;
                   }
                 }
               } else {
                 for (var i = 0; i < objects[j].children.length; i++) {
-                  if (!(players[o].position.x != (objects[i].position.x - blocked_objects[j].size) ||
-                        players[o].position.y != objects[i].position.y))
+                  if (!(currentPlayer.position.x != (objects[i].position.x - blocked_objects[j].size) ||
+                        currentPlayer.position.y != objects[i].position.y))
                   {
-                    players[o].canMove.Right = true;
+                    currentPlayer.canMove.Right = true;
                   }
                 }
               }
 
             } // End main For
 
-            if (players[o].control && players[o].canMove.Right && players[o].position.x < (GAME.Display.width - players[o].size)) {
-              players[o].position.x += 1 * players[o].speed;
+            if (currentPlayer.control && currentPlayer.canMove.Right && currentPlayer.position.x < (GAME.Display.width - currentPlayer.size)) {
+              currentPlayer.position.x += 1 * currentPlayer.speed;
               if (GAME.Display.scroll) {      
-                players[o].camera.x += 1 * players[o].speed;
-                players[o].camera.move(players[o].camera.x, 'x');
+                currentPlayer.camera.x += 1 * currentPlayer.speed;
+                currentPlayer.camera.move(currentPlayer.camera.x, 'x');
               }
             }
 
-            socket.emit('player_' + (o + 1) + ' face', '../img/player_'+(o + 1)+'_right.png');
-            socket.emit('player_' + (o + 1) + ' moving', players[o].position);
+            socket.emit('player_' + (o + 1) + ' face', '../img/players/player_'+(o + 1)+'/player_'+(o + 1)+'_right.png');
+            socket.emit('player_' + (o + 1) + ' moving', currentPlayer.position);
 
            }   // End if -> players.controls
 

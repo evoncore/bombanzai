@@ -2,7 +2,7 @@
 class Box extends Block
 {
 
-  texture = PIXI.Texture.fromImage('../img/box.png');
+  texture = PIXI.Texture.fromImage('../img/map/box.png');
   model;
 
   constructor(params) {
