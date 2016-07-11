@@ -51,15 +51,12 @@ function keySpacebar() {
                           
                         } else {
                           WORLD_MAP.containers.bombs.removeChild(_firstBomb.model);
-                          
                         }
                       }
 
                       
                     } else {
                       objectContainers[i].removeChild(_firstBomb.model);
-                      
-                      
                     }
 
                   }, 1000);
@@ -96,19 +93,14 @@ function keySpacebar() {
                             // findArrayValue - global function from ./functions.ts
                             socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
                           }
-                          
                         } else {
                           WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
-                          
                         }
                       }
                       
                     } else {
                       WORLD_MAP.containers.bombs.removeChild(_otherBomb.model);
-                      
-                      
                     }
-                   
                   }, 1000);
                 }
               }
