@@ -1,4 +1,5 @@
 /// <reference path="app.ts"/>
+/// <reference path="socket/socket.ts"/>
 
 // One Page App
 module ui {
@@ -12,10 +13,10 @@ module ui {
     $('#lobby .players-list li a').on('click', function(e) {
       e.preventDefault();
 
-      if (thisPlayerName != '') {
+      if (thisClientName != '') {
         if (!($('#lobby .btn.ready').hasClass('active'))) {
           if ($(this).text() == 'Пустой слот') {
-              $(this).html('<i>' + thisPlayerName + '</i>')
+              $(this).html('<i>' + thisClientName + '</i>')
                          .parent()
                          .parent()
                          .children()
@@ -35,7 +36,7 @@ module ui {
 
       // if (!($('#lobby .btn.ready').hasClass('active'))) {
       //   if ($(this).text() == 'Пустой слот') {
-      //       $(this).html('<i>' + thisPlayerName + '</i>')
+      //       $(this).html('<i>' + thisClientName + '</i>')
       //                  .parent()
       //                  .parent()
       //                  .children()

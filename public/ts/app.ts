@@ -36,13 +36,10 @@ var player_1 = new Player({ x: 0,   y: 0 });
 var player_2 = new Player({ x: 320, y: 320 }, PIXI.Texture.fromImage('../img/players/player_2/player_2.png'));
 var player_3 = new Player({ x: 0,   y: 320 }, PIXI.Texture.fromImage('../img/players/player_3/player_3.png'));
 
-var thisPlayerID;
-var thisPlayerName;
-
-/// <reference path="players_controller.ts"/>
+var thisClientID;
+var thisClientName;
 
 /// <reference path="map.ts"/>
-
 
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
@@ -84,7 +81,7 @@ createMap(function() {
     players.push(WORLD_MAP.containers.players.children[player_]);
   }
 
-  // Create Containers
+  // Create ObjectContainers
   for (let key4 in WORLD_MAP.containers) {
     objectContainers.push(WORLD_MAP.containers[key4]);
   }

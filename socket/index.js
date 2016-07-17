@@ -3,11 +3,15 @@ module.exports = function(server) {
 
   var io = require('socket.io')(server);
   var lobbySlots = [];
-  var playersName = [];
-  var players = [];
+  var clientsName = [];
+  var connectedClients = [];
+
+  // For UI playersConnected List
+  var clientsList = connectedClients;
+  var clientsOnSlotPlayer = [];
 
   for (var i = 0; i < 8; i++) {
-    playersName.push( 'Player_' + (i +  1) );
+    clientsName.push( 'Player_' + (i +  1) );
   }
 
   io.on('connection', function(socket) {
@@ -86,14 +90,14 @@ module.exports = function(server) {
     .on('disconnect', function() {
       console.log('user disconnected');
 
-      for (var i = 0; i < players.length; i++) {
-        for (var id in players[i]) {
+      for (var i = 0; i < connectedClients.length; i++) {
+        for (var id in connectedClients[i]) {
 
-          if (players[i]) {
-            if (socket.id.slice(2) == players[i].id) {
-              playersName.unshift(players[i].name);
-              socket.broadcast.emit('player disconnected', players[i].name)
-              players.splice(i, 1);
+          if (connectedClients[i]) {
+            if (socket.id.slice(2) == connectedClients[i].id) {
+              clientsName.unshift(connectedClients[i].name);
+              socket.broadcast.emit('player disconnected', connectedClients[i].name)
+              connectedClients.splice(i, 1);
             }
           }
         }
@@ -113,53 +117,43 @@ module.exports = function(server) {
   //===================================//
 
   // Player ID
-  socket.emit('player id', clientsArray);
-  socket.emit('player name', playersName);
+  socket.emit('client id', clientsArray);
+  socket.emit('client name', clientsName);
 
   socket.on('object: client', function(name) {
-    players.push(name);
-    console.log(players);
+    connectedClients.push(name);
+    console.log(connectedClients);
     var name;
 
-    for (var i = 0; i < players.length; i++) {
-      for (var id in players[i]) {
+    for (var i = 0; i < connectedClients.length; i++) {
+      for (var id in connectedClients[i]) {
 
-        if (players[i]) {
-          if (socket.id.slice(2) == players[i].id) {
-            name = players[i].name;
+        if (connectedClients[i]) {
+          if (socket.id.slice(2) == connectedClients[i].id) {
+            name = connectedClients[i].name;
           }
         }
       }
     }
 
-    socket.emit('player connected', name);
-    socket.broadcast.emit('player connected', name);
+    socket.emit('client connected', name);
+    socket.broadcast.emit('client connected', name);
 
-    socket.emit('players connected', players);
-    socket.broadcast.emit('players connected', players);
+    socket.emit('clients connected', clientsList);
+    socket.broadcast.emit('clients connected', clientsList);
   });
 
-  socket.on('players name', function(names) {
-    playersName = names;
-    console.log(playersName);
-  });
-  // socket
-  //   .on('player in slot', function(data) {
-  //     if (lobbySlots.length == 0) {
-  //       lobbySlots.push(clients);
-  //     } else {
-  //       for (var i = 0; i < lobbySlots.length; i++) {
-  //         if (lobbySlots[i] != clients) {
-  //           lobbySlots.push(clients);
-  //         } else {
-  //           lobbySlots.splice(lobbySlots[i]);
-  //         }
-  //       }
-  //     }
+  socket.on('clients connected update', function(connectedClients) {
+    clientsList = connectedClients;
 
-  //     socket.emit('player in slot_res', lobbySlots);
-  //     socket.broadcast.emit('player in slot_res', lobbySlots);
-  //   });
+    socket.emit('clients connected', clientsList);
+    socket.broadcast.emit('clients connected', clientsList);
+  });
+
+  socket.on('clients name', function(names) {
+    clientsName = names;
+    console.log(clientsName);
+  });
 
   });
 

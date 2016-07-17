@@ -4,73 +4,95 @@
 
 // Lobby
 
-var connectedPlayers = [];
+var connectedClients = [];
 
 socket
 
-// players id -> players_controller.ts
-.on('player id', function(id) {
+.on('client id', function(id) {
 
   for (var i = 0; i < id.length; i++) {
     if (socket.id == id[i]) {
-      thisPlayerID = id[i];
+      thisClientID = id[i];
     }
   }
 
 })
 
 // Get name
-.on('player name', function(names) {
+.on('client name', function(names) {
 
-  thisPlayerName = names.shift().toString();
+  thisClientName = names.shift().toString();
 
-  client.id = thisPlayerID;
-  client.name = thisPlayerName;
+  client.id = thisClientID;
+  client.name = thisClientName;
 
   socket.emit('object: client', client);
-  socket.emit('players name', names);
+  socket.emit('clients name', names);
+
+  if (client.name == 'Player_1') {
+    player_1.model.control = true;
+  }
+
+  if (client.name == 'Player_2') {
+    player_2.model.control = true;
+  }
+
+  if (client.name == 'Player_3') {
+    player_3.model.control = true;
+  }
 })
 
-// Player leave from slot
-// .on('player leave from slot', function(data) {
-//   $('#lobby .players-list li a').eq(data - 1).text('Пустой слот');
-// })
-
-// Player Connected
-.on('player connected', function(player) {
-  ul.append('<li class="sys-msg player-connected">' + player + ' подключился</li>');
+// Client Connected
+.on('client connected', function(client) {
+  ul.append('<li class="sys-msg player-connected">' + client + ' подключился</li>');
   socket.on('chat message', function(msg) {
     ul.append('<li>' + msg + '</li>');
     // ul.append('<li><b>' + player + '</b>: ' + msg + '</li>');
   });
 })
 
-// Player Disconnected
-.on('player disconnected', function(player) {
-  connectedList.append('<li class="player-connected">' + player + '</li>');
-  ul.append('<li class="sys-msg player-connected">' + player + ' отключился</li>');
+// Client Disconnected
+.on('client disconnected', function(client) {
+  connectedList.append('<li class="player-connected">' + client + '</li>');
+  ul.append('<li class="sys-msg player-connected">' + client + ' отключился</li>');
 })
 
-.on('players connected', function(players) {
-  connectedPlayers = players;
+.on('clients connected', function(clients) {
+  connectedClients = clients;
+
+  removeClientList();
+  for (var i = 0; i < connectedClients.length; i++) {
+    connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
+  }
+
+  $('#lobby .players-list li a').on('click', function(e) {
+    e.preventDefault();
+
+    if (connectedClients) {
+      removeClientList();
+      removeClientFromList(function() {
+        for (var i = 0; i < connectedClients.length; i++) {
+          connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
+        }
+
+        socket.emit('clients connected update', connectedClients);
+      });
+    }
+
+  });
+})
+
+function removeClientFromList(callback) {
+  for (var i = 0; i < connectedClients.length; i++) {
+    if (connectedClients[i].name == thisClientName) {
+      connectedClients.splice(i, 1);
+    }
+  }
+  callback();
+}
+
+function removeClientList() {
   connectedList.remove();
   $('#lobby .connected').append('<ul></ul>');
   connectedList = $('#lobby .connected ul');
-  for (var i = 0; i < connectedPlayers.length; i++) {
-    connectedList.append('<li class="player-connected">' + connectedPlayers[i].name + '</li>');
-  }
-})
-
-// socket.emit('player in slot', null);
-// socket
-//   .on('player in slot_res', function(data) {
-//     console.log(data)
-//     for (var i = 0; i < data.length; i++) {
-//       $('#lobby .connected ul').append('<li>' + (playerNames[(data[i] - 1)]) + '</li>');
-//     }
-//     for (var i = 0; i < $('#lobby .players-list li a').length; i++) {
-//       if ($('#lobby .players-list li a').eq(i).text() != 'Пустой слот') {
-//         prevSlot = i;
-//       }
-//     }
-//   })
+}

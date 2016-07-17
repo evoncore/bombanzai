@@ -5,8 +5,8 @@ class Game
   status = 'lobby';
 
   Display = {
-    width: 340,
-    height: 340,
+    width: 940,
+    height: 580,
     scroll: false
   };
 
