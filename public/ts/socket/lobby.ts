@@ -5,6 +5,7 @@
 // Lobby
 
 var connectedClients = [];
+var clientJumpName;
 
 socket
 
@@ -57,38 +58,90 @@ socket
   ul.append('<li class="sys-msg player-connected">' + client + ' отключился</li>');
 })
 
-.on('clients connected', function(clients) {
-  connectedClients = clients;
-
-  removeClientList();
-  for (var i = 0; i < connectedClients.length; i++) {
-    connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
-  }
-
-  $('#lobby .players-list li a').on('click', function(e) {
-    e.preventDefault();
-
-    if (connectedClients) {
-      removeClientList();
-      removeClientFromList(function() {
-        for (var i = 0; i < connectedClients.length; i++) {
-          connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
-        }
-
-        socket.emit('clients connected update', connectedClients);
-      });
-    }
-
-  });
+.on('clients on slot player_res', function(client) {
+  clientJumpName = client;
 })
 
-function removeClientFromList(callback) {
+.on('clients on slot player (slot number)_res', function(client) {
+  $('#lobby .players-list li a').eq(client).html('<i>' + clientJumpName + '</i>');
+})
+
+.on('empty slot_res', function(emptySlot) {
+  if (emptySlot != null) {
+    $('#lobby .players-list li').eq(emptySlot)
+                                .children('a')
+                                .text('Пустой слот');
+  }
+})
+
+.on('clients connected list', function(clients) {
+  connectedClients = clients;
+
+  if (connectedClients.length > 0) {
+
+    removeClientList();
+    for (var i = 0; i < connectedClients.length; i++) {
+      connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
+    }
+
+    $('#lobby .players-list li a').on('click', function(e) {
+      e.preventDefault();
+
+      if ($(this).text() == 'Пустой слот') {
+
+        var clientsOnSlotPlayer;
+        var thisIndex = $(this).parent().index();
+
+        if (thisClientName != '') {
+          if (!($('#lobby .btn.ready').hasClass('active'))) {
+            if ($(this).text() == 'Пустой слот') {
+              $(this).html('<i>' + thisClientName + '</i>')
+                         .parent()
+                         .parent()
+                         .children()
+                         .eq(prevSlot)
+                         .children('a')
+                         .text('Пустой слот');
+
+              socket.emit('empty slot', prevSlot);
+              prevSlot = $(this).parent().index();
+            }
+          }
+        }
+
+        if (connectedClients) {
+          removeClientList();
+          removeClientFromList(clientsOnSlotPlayer, function(clientsOnSlotPlayer) {
+            var cosp;
+
+            if (clientsOnSlotPlayer) {
+              cosp = clientsOnSlotPlayer;
+              socket.emit('clients on slot player', cosp);
+            }
+
+            for (var i = 0; i < connectedClients.length; i++) {
+              connectedList.append('<li class="player-connected">' + connectedClients[i].name + '</li>');
+            }
+
+            socket.emit('clients connected list update', connectedClients);
+          });
+        }
+
+        socket.emit('clients on slot player (slot number)', thisIndex);
+      }
+    });
+  }
+})
+
+function removeClientFromList(clientsOnSlotPlayer, callback) {
+
   for (var i = 0; i < connectedClients.length; i++) {
     if (connectedClients[i].name == thisClientName) {
-      connectedClients.splice(i, 1);
+      clientsOnSlotPlayer = connectedClients.splice(i, 1);
     }
   }
-  callback();
+
+  callback(clientsOnSlotPlayer);
 }
 
 function removeClientList() {

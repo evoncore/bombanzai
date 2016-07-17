@@ -9,27 +9,6 @@ module ui {
   // Lobby
 
     // Lists
-    
-    $('#lobby .players-list li a').on('click', function(e) {
-      e.preventDefault();
-
-      if (thisClientName != '') {
-        if (!($('#lobby .btn.ready').hasClass('active'))) {
-          if ($(this).text() == 'Пустой слот') {
-              $(this).html('<i>' + thisClientName + '</i>')
-                         .parent()
-                         .parent()
-                         .children()
-                         .eq(prevSlot)
-                         .children('a')
-                         .text('Пустой слот');
-
-              prevSlot = $(this).parent().index();
-          }
-        }
-      }
-
-    });
 
     $('#lobby .spectators-list li a').on('click', function(e) {
       e.preventDefault();

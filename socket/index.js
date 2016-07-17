@@ -7,7 +7,6 @@ module.exports = function(server) {
   var connectedClients = [];
 
   // For UI playersConnected List
-  var clientsList = connectedClients;
   var clientsOnSlotPlayer = [];
 
   for (var i = 0; i < 8; i++) {
@@ -103,8 +102,6 @@ module.exports = function(server) {
         }
       }
 
-    // socket.emit('player leave from slot', clientsArray);
-    // socket.broadcast.emit('player leave from slot', clientsArray);
   });
 
   // Ping to Client
@@ -120,9 +117,12 @@ module.exports = function(server) {
   socket.emit('client id', clientsArray);
   socket.emit('client name', clientsName);
 
+  socket.on('clients name', function(names) {
+    clientsName = names;
+  });
+
   socket.on('object: client', function(name) {
     connectedClients.push(name);
-    console.log(connectedClients);
     var name;
 
     for (var i = 0; i < connectedClients.length; i++) {
@@ -139,21 +139,29 @@ module.exports = function(server) {
     socket.emit('client connected', name);
     socket.broadcast.emit('client connected', name);
 
-    socket.emit('clients connected', clientsList);
-    socket.broadcast.emit('clients connected', clientsList);
+    socket.emit('clients connected list', connectedClients);
+    socket.broadcast.emit('clients connected list', connectedClients);
   });
 
-  socket.on('clients connected update', function(connectedClients) {
-    clientsList = connectedClients;
-
-    socket.emit('clients connected', clientsList);
-    socket.broadcast.emit('clients connected', clientsList);
+  socket.on('clients connected list update', function(connectedClients) {
+    socket.emit('clients connected list', connectedClients);
+    socket.broadcast.emit('clients connected list', connectedClients);
   });
 
-  socket.on('clients name', function(names) {
-    clientsName = names;
-    console.log(clientsName);
+  socket.on('clients on slot player', function(clients) {
+    socket.emit('clients on slot player_res', clients[0].name);
+    socket.broadcast.emit('clients on slot player_res', clients[0].name);
   });
+
+  socket.on('clients on slot player (slot number)', function(slotNumber) {
+    socket.emit('clients on slot player (slot number)_res', slotNumber);
+    socket.broadcast.emit('clients on slot player (slot number)_res', slotNumber);
+  });
+
+  socket.on('empty slot', function(emptySlot) {
+    socket.broadcast.emit('empty slot_res', emptySlot);
+  });
+
 
   });
 
