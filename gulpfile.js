@@ -16,15 +16,15 @@ gulp.task('ts', function() {
 
 });
 
-gulp.task('login-ts', function() {
+// gulp.task('login-ts', function() {
 
-  return gulp.src('public/ts/client/login.ts')
-    .pipe(ts({
-      out: 'login.js'      
-    }))
-    .pipe(gulp.dest('public/src/js/'))
+//   return gulp.src('public/ts/client/login.ts')
+//     .pipe(ts({
+//       out: 'login.js'      
+//     }))
+//     .pipe(gulp.dest('public/src/js/'))
 
-});
+// });
 
 gulp.task('sass', function() {
 
@@ -45,7 +45,7 @@ gulp.task('autoprefix-css', function() {
 
 gulp.task('watch', function() {
 
-  gulp.watch('public/ts/client/login.ts', ['login-ts']);
+  // gulp.watch('public/ts/client/login.ts', ['login-ts']);
   gulp.watch('public/ts/**/*.ts', ['ts']);
   gulp.watch('public/sass/*.sass', ['sass']);
   gulp.watch('public/src/css/*.css', ['autoprefix-css']);
@@ -53,4 +53,5 @@ gulp.task('watch', function() {
 
 });
 
-gulp.task('default', ['login-ts', 'ts', 'sass', 'autoprefix-css', 'watch']);
+// first task: 'login-ts',
+gulp.task('default', ['ts', 'sass', 'autoprefix-css', 'watch']);

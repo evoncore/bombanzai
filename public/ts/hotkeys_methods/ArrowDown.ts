@@ -94,6 +94,7 @@ function keyArrowDown() {
 
             socket.emit('player_' + (o + 1) + ' face', '../img/players/player_'+(o + 1)+'/player_'+(o + 1)+'_bottom.png');
             socket.emit('player_' + (o + 1) + ' moving', currentPlayer.position);
+
           }   // End if -> players.controls
 
         }   // End Players For

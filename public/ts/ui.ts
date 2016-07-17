@@ -3,14 +3,68 @@
 // One Page App
 module ui {
 
+  // UI
+
+  // Lobby
+
+    // Lists
+    
+    $('#lobby .players-list li a').on('click', function(e) {
+      e.preventDefault();
+
+      if (thisPlayerName != '') {
+        if (!($('#lobby .btn.ready').hasClass('active'))) {
+          if ($(this).text() == 'Пустой слот') {
+              $(this).html('<i>' + thisPlayerName + '</i>')
+                         .parent()
+                         .parent()
+                         .children()
+                         .eq(prevSlot)
+                         .children('a')
+                         .text('Пустой слот');
+
+              prevSlot = $(this).parent().index();
+          }
+        }
+      }
+
+    });
+
+    $('#lobby .spectators-list li a').on('click', function(e) {
+      e.preventDefault();
+
+      // if (!($('#lobby .btn.ready').hasClass('active'))) {
+      //   if ($(this).text() == 'Пустой слот') {
+      //       $(this).html('<i>' + thisPlayerName + '</i>')
+      //                  .parent()
+      //                  .parent()
+      //                  .children()
+      //                  .eq(prevSlot)
+      //                  .children('a')
+      //                  .text('Пустой слот');
+
+      //       prevSlot = $(this).parent().index();
+      //   }
+      // }
+
+    });
+
+    // Ready Button
+
+    $('#lobby .btn.ready').on('click', function() {
+      $(this).toggleClass('active');
+    });
+
+  // Lobby end
+
   $(window).on('gamepadconnection', function(e) {
     console.log('gamepad-connected!');
   });
 
   $('aside nav li.game').addClass('active');
-  location.href = '#/game';
+  location.href = '#/lobby';
   $('section').stop().fadeOut(200);
-  $('#game').stop().fadeIn(200);
+  $('#lobby').stop().fadeIn(200);
 
   $('aside nav a').on('click', function(e) {
 
@@ -60,22 +114,21 @@ module ui {
   $('#game #game-display').append('<div id="grid"></div>');
   $('#game #game-display #grid').css({
     width: GAME.Display.width + 'px',
-    top: 0,
-    left: $('canvas').css('left')
+    height: GAME.Display.height + 'px'
   });
 
-  for (var i = 0; i < 0; i++) { // 5000
+  for (var i = 0; i < 289; i++) { // 5000
     $('#game #game-display  #grid').append('<i class="map-tile"></i>');
   }
 
 
   // Bar
 
-  var staticBombsCount = player_1.model.bombsCount;
+  // var staticBombsCount = player_1.model.bombsCount;
 
   $('#game #bar .row').prepend('<div class="col-md-9"></div>')
   $('#game #bar .col-md-9').append('<span class="hp">hp: <b>100 / 100</b></span>');
-  $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
+  // $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
 
 
   // Asides
@@ -87,7 +140,7 @@ module ui {
   // Chat
 
   $('#chat').css({
-    height: $('body').innerHeight() - $('#bar').innerHeight() + 'px' 
+    height: $('body').innerHeight() + 'px'
   });
 
 

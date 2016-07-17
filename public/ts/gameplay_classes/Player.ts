@@ -18,6 +18,7 @@ class Player extends Block
     });
 
     this.texture = texture;
+
     this.model = new PIXI.Sprite(this.texture);
     this.model._a_name = 'player';
     this.model.control = false;

@@ -33,7 +33,7 @@ app.use('/', index);
 //   resave: false,
 //   saveUninitialized: true,
 //   cookie: {
-//     httpOnly: false,
+//     httpOnly: true,
 //     maxAge: null
 //   },
 //   store: new MongoStore({mongooseConnection: mongoose.connection})

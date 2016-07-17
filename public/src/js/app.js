@@ -3,35 +3,35 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-/// <reference path="../app.ts"/>
 var socket = io('', {
+    reconnection: true,
     'reconnectionDelay': 1,
     'reconnectionAttempts': 60
 });
 var ul = $('#chat ul');
 var form = $('#chat form');
+var connectedList = $('#lobby .connected ul');
+var prevSlot;
+var client = { id: null, name: null };
+// Game UI
+function gameContinue() {
+    if ($('#game').hasClass('paused')) {
+        $('#game .shadow').remove();
+        $('#game').removeClass('paused');
+    }
+}
+function gamePaused() {
+    if ($('#game').hasClass('paused') && $('#game').children('.shadow').length == 0) {
+        $('#game').append('<div class="shadow"></div>');
+        $('#game .shadow').append('<p class="message">Game is Paused</p>');
+    }
+}
+/// <reference path="../app.ts"/>
+/// <reference path="../game_ui.ts"/>
+/// <reference path="socket.ts"/>
 form.on('submit', function (e) { e.preventDefault(); });
 socket
-    .on('chat message', function (msg) {
-    ul.append('<li>' + msg + '</li>');
-})
     .on('connect', function () {
-    // players id
-    socket.on('player id', function (id) {
-        var num = id;
-        if (id > 3) {
-            id = 0;
-        }
-        if (id == 1) {
-            player_1.model.control = true;
-        }
-        if (id == 2) {
-            player_2.model.control = true;
-        }
-        if (id == 3) {
-            player_3.model.control = true;
-        }
-    });
     // players coords
     for (var o = 0; o < players.length; o++) {
         socket.emit('player_' + (o + 1) + ' moving', players[o].position);
@@ -53,15 +53,26 @@ socket
         }
     })
         .on('bomb coords_res', function (bomb_coords_res) {
-        var bomb = new Bomb({ x: bomb_coords_res.x, y: bomb_coords_res.y, waveLevel: 1 });
+        var bomb = new Bomb({ x: bomb_coords_res.x, y: bomb_coords_res.y, waveLevel: 1 }, PIXI.Texture.fromImage(bomb_coords_res.bombImg));
         WORLD_MAP.containers.bombs.addChild(bomb.model);
     })
         .on('bomb coords_remove_res', function (bomb_remove_coords_res) {
-        for (var i = 0; i < WORLD_MAP.containers.bombs.children.length; ++i) {
+        for (var i = 0; i < WORLD_MAP.containers.bombs.children.length; i++) {
             if (WORLD_MAP.containers.bombs.children[i].position.x == bomb_remove_coords_res.x &&
                 WORLD_MAP.containers.bombs.children[i].position.y == bomb_remove_coords_res.y) {
                 WORLD_MAP.containers.bombs.removeChild(WORLD_MAP.containers.bombs.children[i]);
             }
+        }
+    })
+        .on('pause_res', function (paused_res) {
+        if (paused_res == 'paused') {
+            $('#game').addClass(paused_res);
+            GAME.status = paused_res;
+            gamePaused();
+        }
+        else if (paused_res == 'running') {
+            GAME.status = paused_res;
+            gameContinue();
         }
     });
 });
@@ -72,12 +83,63 @@ socket.on('pong', function (data) {
         $('#ping span').text('ping: ' + data);
     }
 });
-var ul = $('#chat ul');
-var form = $('#chat form');
+/// <reference path="../app.ts"/>
+/// <reference path="../game_ui.ts"/>
+/// <reference path="socket.ts"/>
+// Lobby
+var connectedPlayers = [];
+socket
+    .on('player id', function (id) {
+    for (var i = 0; i < id.length; i++) {
+        if (socket.id == id[i]) {
+            thisPlayerID = id[i];
+        }
+    }
+})
+    .on('player name', function (names) {
+    thisPlayerName = names.shift().toString();
+    client.id = thisPlayerID;
+    client.name = thisPlayerName;
+    socket.emit('object: client', client);
+    socket.emit('players name', names);
+})
+    .on('player connected', function (player) {
+    ul.append('<li class="sys-msg player-connected">' + player + ' подключился</li>');
+    socket.on('chat message', function (msg) {
+        ul.append('<li>' + msg + '</li>');
+        // ul.append('<li><b>' + player + '</b>: ' + msg + '</li>');
+    });
+})
+    .on('player disconnected', function (player) {
+    connectedList.append('<li class="player-connected">' + player + '</li>');
+    ul.append('<li class="sys-msg player-connected">' + player + ' отключился</li>');
+})
+    .on('players connected', function (players) {
+    connectedPlayers = players;
+    connectedList.remove();
+    $('#lobby .connected').append('<ul></ul>');
+    connectedList = $('#lobby .connected ul');
+    for (var i = 0; i < connectedPlayers.length; i++) {
+        connectedList.append('<li class="player-connected">' + connectedPlayers[i].name + '</li>');
+    }
+});
+// socket.emit('player in slot', null);
+// socket
+//   .on('player in slot_res', function(data) {
+//     console.log(data)
+//     for (var i = 0; i < data.length; i++) {
+//       $('#lobby .connected ul').append('<li>' + (playerNames[(data[i] - 1)]) + '</li>');
+//     }
+//     for (var i = 0; i < $('#lobby .players-list li a').length; i++) {
+//       if ($('#lobby .players-list li a').eq(i).text() != 'Пустой слот') {
+//         prevSlot = i;
+//       }
+//     }
+//   }) 
+/// <reference path="socket.ts"/>
 socket
     .on('connect', function () {
     ul.append('<li class="sys-msg">Соединение установлено</li>');
-    ;
     form.on('submit', sendMessage);
 })
     .on('disconnect', function () {
@@ -95,11 +157,6 @@ function sendMessage() {
     return false;
 }
 ;
-function returnValue(value) {
-    return {
-        v: value
-    };
-}
 function findArrayValue(array, value) {
     if (array.indexOf) {
         return array.indexOf(value);
@@ -113,8 +170,14 @@ function findArrayValue(array, value) {
 function slicePixels(obj) {
     return Number(obj.length == 5 ? obj.slice(0, 3) : obj.slice(0, 2));
 }
+function randomInteger(min, max) {
+    var rand = min + Math.random() * (max - min);
+    rand = Math.round(rand);
+    return rand;
+}
 var Game = (function () {
     function Game() {
+        this.status = 'lobby';
         this.Display = {
             width: 340,
             height: 340,
@@ -227,17 +290,18 @@ var Player = (function (_super) {
 }(Block));
 var Bomb = (function (_super) {
     __extends(Bomb, _super);
-    function Bomb(params) {
+    function Bomb(params, texture) {
+        if (texture === void 0) { texture = PIXI.Texture.fromImage('../img/players/bomb.png'); }
         _super.call(this, {
             blocked: true,
             destroy: true
         });
-        this.texture = PIXI.Texture.fromImage('../img/players/bomb.png');
         this.waveLevel = {
             size: null,
             level: 1,
             wave: null
         };
+        this.texture = texture;
         this.model = new PIXI.Sprite(this.texture);
         this.model._a_name = 'bomb';
         this.model.position.x = params.x;
@@ -314,23 +378,14 @@ var Sand = (function (_super) {
     }
     return Sand;
 }(Block));
-// DO NOT TOUCH. Not for dynamic generation; initialized in the code -->
-var exampleBlock = new Block({
-    blocked: false,
-    destroy: false
-});
-var examplePlayer = new Sand({ x: 0, y: 0 });
-var exampleWall = new Wall({ x: 0, y: 0 });
-var exampleBox = new Box({ x: 0, y: 0 });
-var exampleBomb = new Bomb({ x: 0, y: 0, waveLevel: 1 });
-var exampleSand = new Sand({ x: 0, y: 0 });
-// <-- end // 
 //=== DEPENDING ON ===//
 /// <reference path="../typings/jquery/jquery.d.ts"/>
 /// <reference path="../typings/pixi.js/pixi.js.d.ts"/>
 /// <reference path="../typings/socket.io-client/socket.io-client.d.ts"/>
 //=== IMPORT FILES ===//
+/// <reference path="socket/socket.ts"/>
 /// <reference path="socket/game.ts"/>
+/// <reference path="socket/lobby.ts"/>
 /// <reference path="socket/chat.ts"/>
 /// <reference path="functions.ts"/>
 /// <reference path="classes/Game.ts"/>
@@ -343,30 +398,14 @@ var exampleSand = new Sand({ x: 0, y: 0 });
 /// <reference path="gameplay_classes/Box.ts"/>
 /// <reference path="gameplay_classes/landscape/Sand.ts"/>
 //=== CODE ===//
-/// <reference path="example_blocks.ts"/>
 var GAME = new Game;
 var WORLD_MAP = new WorldMap;
 var player_1 = new Player({ x: 0, y: 0 });
 var player_2 = new Player({ x: 320, y: 320 }, PIXI.Texture.fromImage('../img/players/player_2/player_2.png'));
 var player_3 = new Player({ x: 0, y: 320 }, PIXI.Texture.fromImage('../img/players/player_3/player_3.png'));
-socket.on('player id', function (id) {
-    var num = id;
-    if (id.length >= 4) {
-        id = 0;
-    }
-    if (id > 3) {
-        id = 0;
-    }
-    if (id == 1) {
-        player_1.model.control = true;
-    }
-    if (id == 2) {
-        player_2.model.control = true;
-    }
-    if (id == 3) {
-        player_3.model.control = true;
-    }
-});
+var thisPlayerID;
+var thisPlayerName;
+/// <reference path="players_controller.ts"/>
 /// <reference path="map.ts"/>
 var renderer = PIXI.autoDetectRenderer(GAME.Display.width, GAME.Display.height, { backgroundColor: 0x999999 });
 $('#game').append('<div id="game-display"></div>');
@@ -406,6 +445,7 @@ createMap(function () {
 });
 /// <reference path="hotkeys.ts"/>
 // UI
+/// <reference path="game_ui.ts"/>
 /// <reference path="ui.ts"/> 
 var Controls = (function () {
     function Controls() {
@@ -439,6 +479,12 @@ var Controls = (function () {
                     val: 32,
                     action: function () {
                         keySpacebar().pressed();
+                    }
+                },
+                Pause: {
+                    val: 80,
+                    action: function () {
+                        keyPause().pressed();
                     }
                 }
             }
@@ -782,38 +828,18 @@ function keySpacebar() {
             var _loop_1 = function() {
                 if (players[o].control) {
                     currentPlayer = players[o];
+                    currentPlayer.position.bombImg = '../img/players/player_' + (o + 1) + '/player_' + (o + 1) + '_bomb.png';
                     if (currentPlayer.bombsCount > 0) {
                         showBombsValue(currentPlayer.bombsCount, currentPlayer.bombsValue);
                         if (WORLD_MAP.containers.bombs.children.length === 0) {
                             socket.emit('bomb coords', currentPlayer.position);
-                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
+                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 }, PIXI.Texture.fromImage(currentPlayer.position.bombImg));
                             WORLD_MAP.containers.bombs.addChild(bomb.model);
                             if (bomb) {
                                 var _firstBomb_1 = bomb;
                                 setTimeout(function () {
                                     if (destroyObjects.length !== 0) {
-                                        for (var i = 0; i < destroyObjects.length; i++) {
-                                            if (_firstBomb_1.model.position.y === (destroyObjects[i].position.y - _firstBomb_1.waveLevel.wave) &&
-                                                _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                _firstBomb_1.model.position.y === (destroyObjects[i].position.y + _firstBomb_1.waveLevel.wave) &&
-                                                    _firstBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                _firstBomb_1.model.position.x === (destroyObjects[i].position.x - _firstBomb_1.waveLevel.wave) &&
-                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                _firstBomb_1.model.position.x === (destroyObjects[i].position.x + _firstBomb_1.waveLevel.wave) &&
-                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                _firstBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                                    _firstBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                                // ..done ->
-                                                socket.emit('bomb coords_remove', _firstBomb_1.model.position);
-                                                for (var z = 0; z < objectContainers.length; z++) {
-                                                    // findArrayValue - global function from ./functions.ts
-                                                    socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
-                                                }
-                                            }
-                                            else {
-                                                socket.emit('bomb coords_remove', _firstBomb_1.model.position);
-                                            }
-                                        }
+                                        bombBang(_firstBomb_1);
                                     }
                                     else {
                                         socket.emit('bomb coords_remove', _firstBomb_1.model.position);
@@ -822,34 +848,14 @@ function keySpacebar() {
                             }
                         }
                         else if (currentPlayer.position.x !== bomb.model.position.x || currentPlayer.position.y !== bomb.model.position.y) {
-                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 });
+                            socket.emit('bomb coords', currentPlayer.position);
+                            bomb = new Bomb({ x: currentPlayer.position.x, y: currentPlayer.position.y, waveLevel: 1 }, PIXI.Texture.fromImage(currentPlayer.position.bombImg));
                             WORLD_MAP.containers.bombs.addChild(bomb.model);
                             if (bomb) {
                                 var _otherBomb_1 = bomb;
                                 setTimeout(function () {
                                     if (destroyObjects.length !== 0) {
-                                        for (var i = 0; i < destroyObjects.length; i++) {
-                                            if (_otherBomb_1.model.position.y === (destroyObjects[i].position.y - _otherBomb_1.waveLevel.wave) &&
-                                                _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                _otherBomb_1.model.position.y === (destroyObjects[i].position.y + _otherBomb_1.waveLevel.wave) &&
-                                                    _otherBomb_1.model.position.x === destroyObjects[i].position.x ||
-                                                _otherBomb_1.model.position.x === (destroyObjects[i].position.x - _otherBomb_1.waveLevel.wave) &&
-                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                _otherBomb_1.model.position.x === (destroyObjects[i].position.x + _otherBomb_1.waveLevel.wave) &&
-                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y ||
-                                                _otherBomb_1.model.position.x === destroyObjects[i].position.x &&
-                                                    _otherBomb_1.model.position.y === destroyObjects[i].position.y) {
-                                                // ..done ->
-                                                socket.emit('bomb coords_remove', _otherBomb_1.model.position);
-                                                for (var z = 0; z < objectContainers.length; z++) {
-                                                    // findArrayValue - global function from ./functions.ts
-                                                    socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
-                                                }
-                                            }
-                                            else {
-                                                socket.emit('bomb coords_remove', _otherBomb_1.model.position);
-                                            }
-                                        }
+                                        bombBang(_otherBomb_1);
                                     }
                                     else {
                                         socket.emit('bomb coords_remove', _otherBomb_1.model.position);
@@ -858,12 +864,52 @@ function keySpacebar() {
                             }
                         }
                     }
+                    // remove bombImg from player.position for decrease player.position size
+                    delete currentPlayer.position.bombImg;
                 } // End Main If
             };
             var currentPlayer;
             for (var o = 0; o < players.length; o++) {
                 _loop_1();
             } // End Main For
+        }
+    };
+    function bombBang(bomb) {
+        for (var i = 0; i < destroyObjects.length; i++) {
+            if (bomb.model.position.y === (destroyObjects[i].position.y - bomb.waveLevel.wave) &&
+                bomb.model.position.x === destroyObjects[i].position.x ||
+                bomb.model.position.y === (destroyObjects[i].position.y + bomb.waveLevel.wave) &&
+                    bomb.model.position.x === destroyObjects[i].position.x ||
+                bomb.model.position.x === (destroyObjects[i].position.x - bomb.waveLevel.wave) &&
+                    bomb.model.position.y === destroyObjects[i].position.y ||
+                bomb.model.position.x === (destroyObjects[i].position.x + bomb.waveLevel.wave) &&
+                    bomb.model.position.y === destroyObjects[i].position.y ||
+                bomb.model.position.x === destroyObjects[i].position.x &&
+                    bomb.model.position.y === destroyObjects[i].position.y) {
+                // ..done ->
+                socket.emit('bomb coords_remove', bomb.model.position);
+                for (var z = 0; z < objectContainers.length; z++) {
+                    // findArrayValue - global function from ./functions.ts
+                    socket.emit('bomb bang', findArrayValue(destroyObjects, destroyObjects[i]));
+                }
+            }
+            else {
+                socket.emit('bomb coords_remove', bomb.model.position);
+            }
+        }
+    }
+}
+/// <reference path="../hotkeys.ts"/>
+/// <reference path="../socket/game.ts"/>
+function keyPause() {
+    return {
+        pressed: function () {
+            if ($('#game').hasClass('paused')) {
+                socket.emit('pause', 'running');
+            }
+            else {
+                socket.emit('pause', 'paused');
+            }
         }
     };
 }
@@ -874,113 +920,66 @@ function keySpacebar() {
 /// <reference path="hotkeys_methods/ArrowRight.ts"/>
 /// <reference path="hotkeys_methods/ArrowLeft.ts"/>
 /// <reference path="hotkeys_methods/Spacebar.ts"/>
+/// <reference path="hotkeys_methods/Pause.ts"/>
 var CONTROLS = new Controls;
-var two_keys = false;
 var bomb;
-player_1.camera.x += player_1.model.position.x;
-player_1.camera.y += player_1.model.position.y;
-$('canvas').css({
-    marginLeft: -player_1.camera.x + 'px',
-    marginTop: -player_1.camera.y + 'px'
-});
+if (GAME.Display.scroll) {
+    player_1.camera.x += player_1.model.position.x;
+    player_1.camera.y += player_1.model.position.y;
+    $('canvas').css({ marginLeft: -player_1.camera.x + 'px',
+        marginTop: -player_1.camera.y + 'px' });
+}
 $(document).on('keydown', function (e) {
-    // Disable all default key-events
-    // if (e.stopPropagation) {
-    //   e.stopPropagation();
-    //   e.preventDefault();
-    // }
-    switch (e.which) {
-        case CONTROLS.Keyboard.key.arrowDown.val:
-            ////
-            if (!two_keys) {
+    if (GAME.status == 'running') {
+        // Disable all default key-events
+        // if (e.stopPropagation) {
+        //   e.stopPropagation();
+        //   e.preventDefault();
+        // }
+        switch (e.which) {
+            case CONTROLS.Keyboard.key.arrowDown.val:
+                ////
                 CONTROLS.Keyboard.key.arrowDown.action();
-            }
-            ////
-            break;
-        case CONTROLS.Keyboard.key.arrowUp.val:
-            ////
-            if (!two_keys) {
+                ////
+                break;
+            case CONTROLS.Keyboard.key.arrowUp.val:
+                ////
                 CONTROLS.Keyboard.key.arrowUp.action();
-            }
-            ////
-            break;
-        case CONTROLS.Keyboard.key.arrowRight.val:
-            ////
-            if (!two_keys) {
+                ////
+                break;
+            case CONTROLS.Keyboard.key.arrowRight.val:
+                ////
                 CONTROLS.Keyboard.key.arrowRight.action();
-            }
-            ////
-            break;
-        case CONTROLS.Keyboard.key.arrowLeft.val:
-            ////
-            if (!two_keys) {
+                ////
+                break;
+            case CONTROLS.Keyboard.key.arrowLeft.val:
+                ////
                 CONTROLS.Keyboard.key.arrowLeft.action();
-            }
-            ////
-            break;
-        case CONTROLS.Keyboard.key.Spacebar.val:
-            ////
-            CONTROLS.Keyboard.key.Spacebar.action();
-            ////
-            break;
+                ////
+                break;
+            case CONTROLS.Keyboard.key.Spacebar.val:
+                ////
+                CONTROLS.Keyboard.key.Spacebar.action();
+                ////
+                break;
+            // Pause
+            case CONTROLS.Keyboard.key.Pause.val:
+                ////
+                CONTROLS.Keyboard.key.Pause.action();
+                ////
+                break;
+        }
+    }
+    if (GAME.status == 'paused') {
+        switch (e.which) {
+            case CONTROLS.Keyboard.key.Pause.val:
+                ////
+                CONTROLS.Keyboard.key.Pause.action();
+                ////
+                break;
+        }
     }
 });
-// Top Left
-// twoKeysDown(
-//   function() {
-//     CONTROLS.Keyboard.key.arrowUp.action();
-//     CONTROLS.Keyboard.key.arrowLeft.action();
-//   },
-//   CONTROLS.Keyboard.key.arrowUp.val,
-//   CONTROLS.Keyboard.key.arrowLeft.val
-// );
-// // Top Right
-// twoKeysDown(
-//   function() {
-//     CONTROLS.Keyboard.key.arrowUp.action();
-//     CONTROLS.Keyboard.key.arrowRight.action();
-//   },
-//   CONTROLS.Keyboard.key.arrowUp.val,
-//   CONTROLS.Keyboard.key.arrowRight.val
-// );
-// // Bottom Left
-// twoKeysDown(
-//   function() {
-//     CONTROLS.Keyboard.key.arrowDown.action();
-//     CONTROLS.Keyboard.key.arrowLeft.action();
-//   },
-//   CONTROLS.Keyboard.key.arrowDown.val,
-//   CONTROLS.Keyboard.key.arrowLeft.val
-// );
-// // Bottom Right
-// twoKeysDown(
-//   function() {
-//     CONTROLS.Keyboard.key.arrowDown.action();
-//     CONTROLS.Keyboard.key.arrowRight.action();
-//   },
-//   CONTROLS.Keyboard.key.arrowRight.val,
-//   CONTROLS.Keyboard.key.arrowDown.val
-// );
-// function twoKeysDown(func, key1, key2) {
-//   var codes = [].slice.call(arguments, 1);
-//   var pressed = {};
-//   $(document).on('keydown', function(e) {
-//     pressed[e.keyCode] = true;
-//     two_keys = true;
-//     for (var i = 0; i < codes.length; i++) {
-//       if (!pressed[codes[i]]) {
-//         return;
-//       }
-//     }
-//     // only one click
-//     // pressed = {};
-//     func();
-//   });
-//   $(document).on('keyup', function(e) {
-//     two_keys = false;
-//     delete pressed[e.keyCode];
-//   });
-// } 
 /// <reference path="app.ts"/>
 function createMap(callback) {
     var boxes = [
@@ -1084,25 +1083,25 @@ function createMap(callback) {
         new Wall({ x: 120, y: 300 }),
         // Neutral zone
         // 1 column
-        new SpaceBlock({ x: 200, y: 20 }),
-        new SpaceBlock({ x: 220, y: 20 }),
-        new SpaceBlock({ x: 200, y: 40 }),
-        new SpaceBlock({ x: 220, y: 40 }),
+        new Wall({ x: 200, y: 20 }),
+        new Wall({ x: 220, y: 20 }),
+        new Wall({ x: 200, y: 40 }),
+        new Wall({ x: 220, y: 40 }),
         // 2 column
-        new SpaceBlock({ x: 280, y: 20 }),
-        new SpaceBlock({ x: 300, y: 20 }),
-        new SpaceBlock({ x: 280, y: 40 }),
-        new SpaceBlock({ x: 300, y: 40 }),
+        new Wall({ x: 280, y: 20 }),
+        new Wall({ x: 300, y: 20 }),
+        new Wall({ x: 280, y: 40 }),
+        new Wall({ x: 300, y: 40 }),
         // 3 column
-        new SpaceBlock({ x: 200, y: 100 }),
-        new SpaceBlock({ x: 200, y: 120 }),
-        new SpaceBlock({ x: 220, y: 100 }),
-        new SpaceBlock({ x: 220, y: 120 }),
+        new Wall({ x: 200, y: 100 }),
+        new Wall({ x: 200, y: 120 }),
+        new Wall({ x: 220, y: 100 }),
+        new Wall({ x: 220, y: 120 }),
         // 4 column
-        new SpaceBlock({ x: 280, y: 100 }),
-        new SpaceBlock({ x: 280, y: 120 }),
-        new SpaceBlock({ x: 300, y: 100 }),
-        new SpaceBlock({ x: 300, y: 120 }),
+        new Wall({ x: 280, y: 100 }),
+        new Wall({ x: 280, y: 120 }),
+        new Wall({ x: 300, y: 100 }),
+        new Wall({ x: 300, y: 120 }),
         // Center Wall
         new Wall({ x: 160, y: 160 }),
         new Wall({ x: 140, y: 160 }),
@@ -1144,16 +1143,75 @@ function createMap(callback) {
     callback();
 }
 /// <reference path="app.ts"/>
+socket.on('player id', function (id) {
+    var num = id;
+    if (id.length >= 4) {
+        id = 0;
+    }
+    if (id > 3) {
+        id = 0;
+    }
+    if (id == 1) {
+        player_1.model.control = true;
+    }
+    if (id == 2) {
+        player_2.model.control = true;
+    }
+    if (id == 3) {
+        player_3.model.control = true;
+    }
+});
+/// <reference path="app.ts"/>
 // One Page App
 var ui;
 (function (ui) {
+    // UI
+    // Lobby
+    // Lists
+    $('#lobby .players-list li a').on('click', function (e) {
+        e.preventDefault();
+        if (thisPlayerName != '') {
+            if (!($('#lobby .btn.ready').hasClass('active'))) {
+                if ($(this).text() == 'Пустой слот') {
+                    $(this).html('<i>' + thisPlayerName + '</i>')
+                        .parent()
+                        .parent()
+                        .children()
+                        .eq(prevSlot)
+                        .children('a')
+                        .text('Пустой слот');
+                    prevSlot = $(this).parent().index();
+                }
+            }
+        }
+    });
+    $('#lobby .spectators-list li a').on('click', function (e) {
+        e.preventDefault();
+        // if (!($('#lobby .btn.ready').hasClass('active'))) {
+        //   if ($(this).text() == 'Пустой слот') {
+        //       $(this).html('<i>' + thisPlayerName + '</i>')
+        //                  .parent()
+        //                  .parent()
+        //                  .children()
+        //                  .eq(prevSlot)
+        //                  .children('a')
+        //                  .text('Пустой слот');
+        //       prevSlot = $(this).parent().index();
+        //   }
+        // }
+    });
+    // Ready Button
+    $('#lobby .btn.ready').on('click', function () {
+        $(this).toggleClass('active');
+    });
+    // Lobby end
     $(window).on('gamepadconnection', function (e) {
         console.log('gamepad-connected!');
     });
     $('aside nav li.game').addClass('active');
-    location.href = '#/game';
+    location.href = '#/lobby';
     $('section').stop().fadeOut(200);
-    $('#game').stop().fadeIn(200);
+    $('#lobby').stop().fadeIn(200);
     $('aside nav a').on('click', function (e) {
         e.preventDefault();
         if (!(this.classList.contains('active')) && !(this.classList.contains('exit'))) {
@@ -1189,23 +1247,22 @@ var ui;
     $('#game #game-display').append('<div id="grid"></div>');
     $('#game #game-display #grid').css({
         width: GAME.Display.width + 'px',
-        top: 0,
-        left: $('canvas').css('left')
+        height: GAME.Display.height + 'px'
     });
-    for (var i = 0; i < 0; i++) {
+    for (var i = 0; i < 289; i++) {
         $('#game #game-display  #grid').append('<i class="map-tile"></i>');
     }
     // Bar
-    var staticBombsCount = player_1.model.bombsCount;
+    // var staticBombsCount = player_1.model.bombsCount;
     $('#game #bar .row').prepend('<div class="col-md-9"></div>');
     $('#game #bar .col-md-9').append('<span class="hp">hp: <b>100 / 100</b></span>');
-    $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>' + staticBombsCount + ' / ' + staticBombsCount + '</b></span>');
+    // $('#game #bar .col-md-9').append('<span class="bombs">bombs: <b>'+staticBombsCount+' / '+staticBombsCount+'</b></span>');
     // Asides
     $('body').css({ height: $(window).innerHeight() });
     $('body #main-row > .col-md-1:first-child').css({ height: $('body').innerHeight() });
     // Chat
     $('#chat').css({
-        height: $('body').innerHeight() - $('#bar').innerHeight() + 'px'
+        height: $('body').innerHeight() + 'px'
     });
     // Errors
     if ($(window).innerWidth() <= 1199) {

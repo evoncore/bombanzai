@@ -1,5 +1,5 @@
 {
-  "name": "bombzai",
+  "name": "bombanzai",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -38,7 +38,7 @@
     "url": "git+https://github.com/sentyurin/bomanz.git"
   },
   "keywords": [
-    "bombzai!"
+    "bombanzai!"
   ],
   "bugs": {
     "url": "https://github.com/sentyurin/bomanz/issues"

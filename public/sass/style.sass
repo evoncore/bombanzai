@@ -6,8 +6,9 @@ $mf: 'Exo 2' // Main Font
 $sf: 'Montserrat' // Second Font
 $ap: 'Anonymous Pro' // Anonymous Pro
 $af: sans-serif, Arial // Alternative Fonts
-$mc: #FF7E1F // Main Color #DDFF1F
+$mc: #855CE1 // Main Color #DDFF1F
 $sc: #999 // Second Color
+$fa: 'FontAwesome' // Font Awesome Icons: 
 
 
 // Reset
@@ -17,11 +18,11 @@ $sc: #999 // Second Color
 
 ::selection
   background-color: $mc
-  color: #222
+  color: #fff
 
 ::-moz-selection
   background-color: $mc
-  color: #222
+  color: #fff
 
 ::-webkit-scrollbar
     width:  7px
@@ -46,6 +47,26 @@ a
 
 h1
   margin: 0
+
+.shadow
+  width: 100%
+  position: absolute
+  height: 100%
+  top: 0
+  background-color: rgba(0,0,0,.6)
+  z-index: 9999
+  .message
+    position: absolute
+    text-align: center
+    color: #fff
+    font-size: 2.2em
+    letter-spacing: 1px
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    padding: 10px 20px
+    background-color: rgba(255,255,255,.2)
+    box-shadow: 0 0 5px rgba(0,0,0,.4)
 
 
 // Main Settings
@@ -249,13 +270,139 @@ aside
         color: #FF6B6B
     .active
       border-right: 6px solid $mc
+      text-shadow: 0 0 3px $mc
       a
         color: $mc
+
+
+// Lobby
+
+#lobby
+  width: 100%
+  padding-top: 60px
+  position: relative
+  .col-md-3
+    padding: 0
+  .btn
+    color: #888
+    padding: 10px 30px
+    background-color: rgba(0,0,0,.4)
+    display: block
+    width: 130px
+    border-radius: 0
+    position: absolute
+    bottom: 100px
+    right: 60px
+    transition: $mt
+    border: 3px solid transparent
+    &:hover
+      color: $mc
+    &.active
+      box-shadow: 0 0 3px $mc
+      text-shadow: 0 0 3px $mc
+      color: $mc
+      border: 3px solid $mc
+  ul
+    background-color: rgba(0,0,0,.4)
+    box-shadow: inset 0 0 7px rgba(0,0,0,.4)
+    padding: 4px
+  li
+    display: block
+    font-size: 1.5em
+    position: relative
+    i
+      font-style: normal
+      color: $mc
+      text-shadow: 0 0 3px $mc
+    &:after
+      display: inline-block
+      content: ''
+      height: 20px
+      width: 20px
+      position: absolute
+      right: 8px
+      top: 8px
+      transition: $mt
+    &.player-connected
+      color: $mc
+      text-shadow: 0 0 2px $mc
+
+  a
+    display: inline-block
+    color: #888
+    padding: 8px 0
+    margin-left: 15px
+    width: 50px
+    transition: $mt
+    width: 100%
+    &:hover
+      color: #fff
+  .players-list
+    width: 100%
+    li
+      &:nth-child(1):after
+        background: url('../img/players/player_1/player_1.png')
+      &:nth-child(2):after
+        background: url('../img/players/player_2/player_2.png')
+      &:nth-child(3):after
+        background: url('../img/players/player_3/player_3.png')
+  .spectators-list
+    width: 100%
+    margin-top: 40px
+    li
+      &:after
+        text-align: center
+        font-family: $fa
+        content: '\f06e'
+        color: #aaa
+    li:hover::after
+      color: #fff
+  .connected
+    ul
+      min-height: 37px
+      padding: 4px 0
+    li
+      display: block
+      color: $mc
+      padding: 8px 0
+      margin-left: 15px
+      width: 50px
+      transition: $mt
+      width: 100%
+
+  #map-preview
+    p
+      width: 100%
+      text-align: center
+    #map
+      background-color: #111
+      width: 100%
+      img
+        height: 100%
+        width: 100%
+        margin: 0 auto
+    p.map-name
+      margin-top: 10px
+      font-size: 1.4em
+      color: $mc
+      text-transform: uppercase
+      text-shadow: 0 0 3px $mc
+    li
+      display: block
+      font-size: 1.5em
+      position: relative
+      color: #888
+      padding: 8px 0
+      margin-left: 15px
+      transition: $mt
+      width: 100%
+      i
+        margin-left: 5px
 
 // Game
 
 #game
-  position: relative
+  width: 100%
   height: 100%
   #game-display
     background-color: #444
@@ -267,15 +414,18 @@ aside
   #grid
     position: absolute
     z-index: 2
-    left: 0
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
     bottom: 0
+    overflow: hidden
 
 .map-tile
   width: 20px
   height: 20px
   float: left
-  // border-top: 1px solid rgba(255,255,255,.1)
-  // border-right: 1px solid rgba(255,255,255,.1)
+  border-top: 1px solid rgba(255,255,255,.1)
+  border-right: 1px solid rgba(255,255,255,.1)
   box-sizing: border-box
 
 .player
@@ -289,6 +439,10 @@ aside
 
 canvas
   display: block
+  position: absolute
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
   background-color: #666
   overflow: hidden
   outline: 1px solid #eaeaea
@@ -324,6 +478,7 @@ canvas
   height: 70px
   border-left: 3px solid #111
   left: -3px
+  z-index: 10000
   span
     display: inline-block
     margin: 0 15px
@@ -354,10 +509,17 @@ canvas
       font-size: 1.5em
       color: #fff
       margin: 4px 0
+      b
+        color: $mc
+        font-weight: 600
       &.sys-msg
         font-size: 1.2em
         font-style: italic
         color: $mc * 6
+      &.player-connected
+        color: $mc
+        margin: 10px 0
+        text-shadow: 0 0 2px $mc
 
   form
     position: absolute

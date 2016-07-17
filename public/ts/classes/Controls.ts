@@ -33,6 +33,12 @@ class Controls
         action: function() {
           keySpacebar().pressed();
         }
+      },
+      Pause: {
+        val: 80,
+        action: function() {
+          keyPause().pressed();
+        }
       }
     }
   };

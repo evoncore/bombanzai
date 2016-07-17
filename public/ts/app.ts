@@ -6,12 +6,17 @@
 
 //=== IMPORT FILES ===//
 
+
+/// <reference path="socket/socket.ts"/>
 /// <reference path="socket/game.ts"/>
+/// <reference path="socket/lobby.ts"/>
 /// <reference path="socket/chat.ts"/>
 
 /// <reference path="functions.ts"/>
+
 /// <reference path="classes/Game.ts"/>
 /// <reference path="classes/WorldMap.ts"/>
+
 /// <reference path="gameplay_classes/Block.ts"/>
 /// <reference path="gameplay_classes/SpaceBlock.ts"/>
 /// <reference path="gameplay_classes/Player.ts"/>
@@ -23,38 +28,18 @@
 
 //=== CODE ===//
 
-/// <reference path="example_blocks.ts"/>
-
 const GAME = new Game;
 const WORLD_MAP = new WorldMap;
 
-var player_1 = new Player({ x: 0, y: 0 });
+
+var player_1 = new Player({ x: 0,   y: 0 });
 var player_2 = new Player({ x: 320, y: 320 }, PIXI.Texture.fromImage('../img/players/player_2/player_2.png'));
-var player_3 = new Player({ x: 0, y: 320 }, PIXI.Texture.fromImage('../img/players/player_3/player_3.png'));
+var player_3 = new Player({ x: 0,   y: 320 }, PIXI.Texture.fromImage('../img/players/player_3/player_3.png'));
 
-socket.on('player id', function(id) {
-  var num = id;
+var thisPlayerID;
+var thisPlayerName;
 
-  if (id.length >= 4) {
-    id = 0;
-  }
-
-  if (id > 3) {
-    id = 0;
-  }
-
-  if (id == 1) {
-    player_1.model.control = true;
-  }
-
-  if (id == 2) {
-    player_2.model.control = true;
-  }
-
-  if (id == 3) {
-    player_3.model.control = true;
-  }
-});
+/// <reference path="players_controller.ts"/>
 
 /// <reference path="map.ts"/>
 
@@ -115,4 +100,5 @@ createMap(function() {
 
 // UI
 
+/// <reference path="game_ui.ts"/>
 /// <reference path="ui.ts"/>

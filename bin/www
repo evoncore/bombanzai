@@ -5,14 +5,14 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('bombzai:server');
+var debug = require('debug')('bombanzai:server');
 var http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '4000');
+var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 console.log('server listening on ' + port);
 
@@ -30,7 +30,9 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-// Socket IO
+/**
+ * Socket IO
+ */
 
 require('../socket')(server);
 
